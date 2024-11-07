@@ -8,3 +8,7 @@ require (
 	github.com/stretchr/testify v1.9.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/gissleh/litxap => ../litxap
+//for testing on a local machine's fwew-lib
+replace github.com/fwew/fwew-lib/v5 => ../fwew-lib

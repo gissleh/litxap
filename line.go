@@ -17,14 +17,38 @@ type Line []LinePart
 func (line Line) Run(dict Dictionary) (Line, error) {
 	newLine := append(line[:0:0], line...)
 
+	var mustDouble = map[string]string{
+		"nìyu":    "yorkì",
+		"tsaheyl": "si",
+		"utraya":  "mokri",
+	}
+
+	skip := false
+
 	for i, part := range newLine {
 		if !part.IsWord {
+			continue
+		}
+
+		// If we found a multiword word, don't duplicate
+		if skip {
+			skip = false
 			continue
 		}
 
 		lookup := part.Raw
 		if part.Lookup != "" {
 			lookup = part.Lookup
+		}
+
+		// Collect multiword words with no parts that can be looked up
+		maybeSkip := false
+
+		if _, ok := mustDouble[lookup]; ok {
+			if i+2 < len(newLine) {
+				lookup += newLine[i+1].Raw + newLine[i+2].Raw
+				maybeSkip = true
+			}
 		}
 
 		results, err := dict.LookupEntries(strings.ToLower(lookup))
@@ -34,6 +58,9 @@ func (line Line) Run(dict Dictionary) (Line, error) {
 			}
 
 			return nil, fmt.Errorf("failed to lookup \"%s\": %w", lookup, err)
+		} else if maybeSkip {
+			// If we found a possible multiword word and it matches, skip the next one
+			skip = true
 		}
 
 		for _, result := range results {
