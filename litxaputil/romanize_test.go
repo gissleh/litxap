@@ -39,6 +39,11 @@ func TestRomanize(t *testing.T) {
 		{"nɪ.aj.ˈwɛŋ] or [naj.ˈwɛŋ", []string{"nìay__weng__", "nay__weng__"}},
 		{"tɪ.sjɪ.maw.nʊn.ˈʔi] or [t͡sjɪ.maw.nʊn.ˈʔi", []string{"tìsyìmawnun__'i__", "tsyìmawnun__'i__"}},
 		{"tɪ.sæ.ˈfpɪl.jɛwn] or [t͡sæ.ˈfpɪl.jɛwn", []string{"tìsä__fpìl__yewn", "tsä__fpìl__yewn"}},
+		// Multiple words
+		{"ˈut.ɾa.ja ˈmok.ɾi", []string{"__ut__raya __mok__ri"}},
+		{"t͡sa.ˈhɛjl s·i", []string{"tsa__heyl__ si"}},
+		{"ˈnɪ.ˌju ˈjoɾ.kɪ", []string{"__nì__yu __yor__kì"}},
+		{"t͡sawl sl·u", []string{"tsawl slu"}},
 	}
 
 	for _, row := range table {
