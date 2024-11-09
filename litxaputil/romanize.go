@@ -77,10 +77,8 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 
 	// Make sure it's not the same word with different stresses
 	if len(word) > 2 {
-		word[0] = strings.ReplaceAll(word[0], "[", "")
 		word[0] = strings.ReplaceAll(word[0], "]", "")
 		word[2] = strings.ReplaceAll(word[2], "[", "")
-		word[2] = strings.ReplaceAll(word[2], "]", "")
 
 		if strings.ReplaceAll(word[0], "ˈ", "") == strings.ReplaceAll(word[2], "ˈ", "") {
 			word = []string{strings.ReplaceAll(word[0], "ˈ", "")}
@@ -91,8 +89,6 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 
 	// get the last one only
 	for j := 0; j < len(word); j++ {
-		word[j] = strings.ReplaceAll(word[j], "[", "")
-		word[j] = strings.ReplaceAll(word[j], "]", "")
 		// "or" means there's more than one IPA in this word, and we only want one
 		if word[j] == "or" {
 			bigResults = append(bigResults, results)
