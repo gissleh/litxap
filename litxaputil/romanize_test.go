@@ -10,46 +10,48 @@ func TestRomanize(t *testing.T) {
 	table := []struct {
 		curr     string
 		expected []string
+		stress   [][]int
 	}{
 		// Ordinary words
-		{"tɪ.ˈfmɛ.tok̚", []string{"tì__fme__tok"}},
-		{"u.ˈvan", []string{"u__van__"}},
-		{"ˈu.ɾan", []string{"__u__ran"}},
-		{"ʔawk'", []string{"'awkx"}},
-		{"fko", []string{"fko"}},
-		{"mo", []string{"mo"}},
-		{"t'on", []string{"txon"}},
-		{"tɪ.ˈfmɛ.tok̚", []string{"tì__fme__tok"}},
-		{"t͡sam", []string{"tsam"}},
-		{"fpom", []string{"fpom"}},
-		{"ˈt·a.ɾ·on", []string{"__ta__ron"}},
-		{"ˈʔɛ.koŋ", []string{"__'e__kong"}},
-		{"ɛ.ˈjawɾ", []string{"e__yawr__"}},
-		{"kṛ", []string{"krr"}},
-		{"k'ḷ", []string{"kxll"}},
-		{"po", []string{"po"}},
+		{"tɪ.ˈfmɛ.tok̚", []string{"tìfmetok"}, [][]int{{1}}},
+		{"u.ˈvan", []string{"uvan"}, [][]int{{1}}},
+		{"ˈu.ɾan", []string{"uran"}, [][]int{{0}}},
+		{"ʔawk'", []string{"'awkx"}, [][]int{{-1}}},
+		{"fko", []string{"fko"}, [][]int{{-1}}},
+		{"mo", []string{"mo"}, [][]int{{-1}}},
+		{"t'on", []string{"txon"}, [][]int{{-1}}},
+		{"tɪ.ˈfmɛ.tok̚", []string{"tìfmetok"}, [][]int{{1}}},
+		{"t͡sam", []string{"tsam"}, [][]int{{-1}}},
+		{"fpom", []string{"fpom"}, [][]int{{-1}}},
+		{"ˈt·a.ɾ·on", []string{"taron"}, [][]int{{0}}},
+		{"ˈʔɛ.koŋ", []string{"'ekong"}, [][]int{{0}}},
+		{"ɛ.ˈjawɾ", []string{"eyawr"}, [][]int{{1}}},
+		{"kṛ", []string{"krr"}, [][]int{{-1}}},
+		{"k'ḷ", []string{"kxll"}, [][]int{{-1}}},
+		{"po", []string{"po"}, [][]int{{-1}}},
 		// Flexible syllable stress
-		{"aj.ˈfo] or [ˈaj.fo", []string{"ayfo"}},
-		{"ˈɪ.læ] or [ɪ.ˈlæ", []string{"ìlä"}},
-		{"ˈmɪ.fa] or [mɪ.ˈfa", []string{"mìfa"}},
-		{"ˈt͡sa.kɛm] or [t͡sa.ˈkɛm", []string{"tsakem"}},
-		{"t͡sa.ˈt͡sɛŋ] or [ˈt͡sa.t͡sɛŋ", []string{"tsatseng"}},
+		{"aj.ˈfo] or [ˈaj.fo", []string{"ayfo"}, [][]int{{-1}}},
+		{"ˈɪ.læ] or [ɪ.ˈlæ", []string{"ìlä"}, [][]int{{-1}}},
+		{"ˈmɪ.fa] or [mɪ.ˈfa", []string{"mìfa"}, [][]int{{-1}}},
+		{"ˈt͡sa.kɛm] or [t͡sa.ˈkɛm", []string{"tsakem"}, [][]int{{-1}}},
+		{"t͡sa.ˈt͡sɛŋ] or [ˈt͡sa.t͡sɛŋ", []string{"tsatseng"}, [][]int{{-1}}},
 		// Multiple pronunciation
-		{"nɪ.aw.ˈno.mʊm] or [naw.ˈno.mʊm", []string{"nìaw__no__mum", "naw__no__mum"}},
-		{"nɪ.aj.ˈwɛŋ] or [naj.ˈwɛŋ", []string{"nìay__weng__", "nay__weng__"}},
-		{"tɪ.sjɪ.maw.nʊn.ˈʔi] or [t͡sjɪ.maw.nʊn.ˈʔi", []string{"tìsyìmawnun__'i__", "tsyìmawnun__'i__"}},
-		{"tɪ.sæ.ˈfpɪl.jɛwn] or [t͡sæ.ˈfpɪl.jɛwn", []string{"tìsä__fpìl__yewn", "tsä__fpìl__yewn"}},
+		{"nɪ.aw.ˈno.mʊm] or [naw.ˈno.mʊm", []string{"nìawnomum", "nawnomum"}, [][]int{{2}, {1}}},
+		{"nɪ.aj.ˈwɛŋ] or [naj.ˈwɛŋ", []string{"nìayweng", "nayweng"}, [][]int{{2}, {1}}},
+		{"tɪ.sjɪ.maw.nʊn.ˈʔi] or [t͡sjɪ.maw.nʊn.ˈʔi", []string{"tìsyìmawnun'i", "tsyìmawnun'i"}, [][]int{{4}, {3}}},
+		{"tɪ.sæ.ˈfpɪl.jɛwn] or [t͡sæ.ˈfpɪl.jɛwn", []string{"tìsäfpìlyewn", "tsäfpìlyewn"}, [][]int{{2}, {1}}},
 		// Multiple words
-		{"ˈut.ɾa.ja ˈmok.ɾi", []string{"__ut__raya __mok__ri"}},
-		{"t͡sa.ˈhɛjl s·i", []string{"tsa__heyl__ si"}},
-		{"ˈnɪ.ˌju ˈjoɾ.kɪ", []string{"__nì__yu __yor__kì"}},
-		{"t͡sawl sl·u", []string{"tsawl slu"}},
+		{"ˈut.ɾa.ja ˈmok.ɾi", []string{"utraya mokri"}, [][]int{{0, 0}}},
+		{"t͡sa.ˈhɛjl s·i", []string{"tsaheyl si"}, [][]int{{1, -1}}},
+		{"ˈnɪ.ˌju ˈjoɾ.kɪ", []string{"nìyu yorkì"}, [][]int{{0, 0}}},
+		{"t͡sawl sl·u", []string{"tsawl slu"}, [][]int{{-1, -1}}},
 	}
 
 	for _, row := range table {
 		t.Run(row.curr, func(t *testing.T) {
-			next := RomanizeIPA(row.curr)
-			assert.Equal(t, row.expected, next)
+			spelling, stress := RomanizeIPA(row.curr)
+			assert.Equal(t, row.expected, spelling)
+			assert.Equal(t, row.stress, stress)
 		})
 	}
 }

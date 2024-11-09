@@ -33,24 +33,23 @@ var romanization2 = map[string]string{
 	"ʒ": "ch", "": "", " ": ""}
 
 func nth_rune(word string, n int) (output string) {
-	r := []rune(word)
+	r := len([]rune(word))
 	if n < 0 { // negative index
-		n = len(r) + n
+		n = r + n
 	}
-	if n >= len(r) {
+	if n >= r {
 		return ""
 	}
-	return string(r[n])
+	return string([]rune(word)[n])
 }
 
 func has(word string, character string) (output bool) {
-	r := []rune(word)
 	if len(character) == 0 {
 		return false
 	}
 	c := []rune(character)[0]
-	for i := 0; i < len(r); i++ {
-		if c == r[i] {
+	for _, a := range word {
+		if c == a {
 			return true
 		}
 	}
@@ -58,13 +57,14 @@ func has(word string, character string) (output bool) {
 }
 
 // Helper function to get phonetic transcriptions of secondary pronunciations
-func RomanizeIPA(IPA string) []string {
+func RomanizeIPA(IPA string) ([]string, [][]int) {
+	stressMarkers := [][]int{}
 	// now Romanize the IPA
 	IPA = strings.ReplaceAll(IPA, "ʊ", "u")
 	IPA = strings.ReplaceAll(IPA, "õ", "o") // vonvä' as võvä' only
 	word := strings.Split(IPA, " ")
 
-	results := []string{}
+	results := []string{""}
 
 	// Make sure it's not the same word with different stresses
 	if len(word) > 2 {
@@ -78,6 +78,8 @@ func RomanizeIPA(IPA string) []string {
 		}
 	}
 
+	stressMarkers = append(stressMarkers, []int{})
+
 	// get the last one only
 	for j := 0; j < len(word); j++ {
 		breakdown := ""
@@ -86,22 +88,30 @@ func RomanizeIPA(IPA string) []string {
 		word[j] = strings.ReplaceAll(word[j], "]", "")
 		// "or" means there's more than one IPA in this word, and we only want one
 		if word[j] == "or" {
+			results = append(results, breakdown)
 			breakdown = ""
+			stressMarkers = append(stressMarkers, []int{})
 			continue
 		}
 
+		stressMarkers[len(stressMarkers)-1] = append(stressMarkers[len(stressMarkers)-1], -1)
+
 		syllables := strings.Split(word[j], ".")
+
+		everStressed := false
 
 		/* Onset */
 		for k := 0; k < len(syllables); k++ {
+
 			stressed := strings.Contains(syllables[k], "ˈ")
 
 			syllable := strings.ReplaceAll(syllables[k], "·", "")
 			syllable = strings.ReplaceAll(syllable, "ˈ", "")
 			syllable = strings.ReplaceAll(syllable, "ˌ", "")
 
-			if stressed {
-				breakdown += "__"
+			if stressed && !everStressed {
+				everStressed = true
+				stressMarkers[len(stressMarkers)-1][len(stressMarkers[len(stressMarkers)-1])-1] = k
 			}
 
 			// tsy
@@ -213,12 +223,16 @@ func RomanizeIPA(IPA string) []string {
 					}
 				}
 			}
-			if stressed {
-				breakdown += "__"
-			}
 		}
-		results = append(results, breakdown)
+
+		results[len(results)-1] += breakdown + " "
 	}
 
-	return results
+	newResults := []string{}
+
+	for _, a := range results {
+		newResults = append(newResults, strings.TrimRight(a, " "))
+	}
+
+	return newResults, stressMarkers
 }
