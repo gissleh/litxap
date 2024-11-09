@@ -44,6 +44,8 @@ func TestRomanize(t *testing.T) {
 		{"t͡sa.ˈhɛjl s·i", [][][]string{{{"tsa", "heyl"}, {"si"}}}, [][]int{{1, -1}}},
 		{"ˈnɪ.ˌju ˈjoɾ.kɪ", [][][]string{{{"nì", "yu"}, {"yor", "kì"}}}, [][]int{{0, 0}}},
 		{"t͡sawl sl·u", [][][]string{{{"tsawl"}, {"slu"}}}, [][]int{{-1, -1}}},
+		// Empty string
+		{"", [][][]string{{{}}}, [][]int{{}}},
 	}
 
 	for _, row := range table {

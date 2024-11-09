@@ -32,27 +32,33 @@ var romanization2 = map[string]string{
 	// mistakes and rarities
 	"ʒ": "ch", "": "", " ": ""}
 
-func nth_rune(word string, n int) (output string) {
-	r := len([]rune(word))
-	if n < 0 { // negative index
-		n = r + n
+func nth_rune(word string, n int) string {
+	i := 0
+	for _, r := range word {
+		if i == n {
+			return string(r)
+		}
+		i += 1
 	}
-	if n >= r {
-		return ""
-	}
-	return string([]rune(word)[n])
+
+	return ""
 }
 
-func has(word string, character string) (output bool) {
-	if len(character) == 0 {
-		return false
-	}
-	c := []rune(character)[0]
-	for _, a := range word {
-		if c == a {
-			return true
+func has(word string, ipa string, n int) (output bool) {
+	i := 0
+	for _, s := range ipa {
+		if i == n {
+			j := 0
+			for _, r := range word {
+				if r == s {
+					return true
+				}
+			}
+			j += 1
 		}
+		i += 1
 	}
+
 	return false
 }
 
@@ -84,7 +90,6 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 
 	// get the last one only
 	for j := 0; j < len(word); j++ {
-
 		word[j] = strings.ReplaceAll(word[j], "[", "")
 		word[j] = strings.ReplaceAll(word[j], "]", "")
 		// "or" means there's more than one IPA in this word, and we only want one
@@ -92,6 +97,11 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 			bigResults = append(bigResults, results)
 			results = [][]string{{}}
 			stressMarkers = append(stressMarkers, []int{})
+			continue
+		}
+
+		// In case of empty string
+		if len(word[j]) < 1 {
 			continue
 		}
 
@@ -124,7 +134,7 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 				// ts
 				breakdown += "ts"
 				//tsp
-				if has("ptk", nth_rune(syllable, 3)) {
+				if has("ptk", syllable, 3) {
 					if nth_rune(syllable, 4) == "'" {
 						// ts + ejective onset
 						breakdown += romanization2[syllable[4:6]]
@@ -134,7 +144,7 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 						breakdown += romanization2[string(syllable[4])]
 						syllable = syllable[5:]
 					}
-				} else if has("lɾmnŋwj", nth_rune(syllable, 3)) {
+				} else if has("lɾmnŋwj", syllable, 3) {
 					// ts + other consonent
 					breakdown += romanization2[nth_rune(syllable, 3)]
 					syllable = syllable[4+len(nth_rune(syllable, 3)):]
@@ -142,10 +152,10 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 					// ts without a cluster
 					syllable = syllable[4:]
 				}
-			} else if has("fs", nth_rune(syllable, 0)) {
+			} else if has("fs", syllable, 0) {
 				//
 				breakdown += nth_rune(syllable, 0)
-				if has("ptk", nth_rune(syllable, 1)) {
+				if has("ptk", syllable, 1) {
 					if nth_rune(syllable, 2) == "'" {
 						// f/s + ejective onset
 						breakdown += romanization2[syllable[1:3]]
@@ -155,7 +165,7 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 						breakdown += romanization2[string(syllable[1])]
 						syllable = syllable[2:]
 					}
-				} else if has("lɾmnŋwj", nth_rune(syllable, 1)) {
+				} else if has("lɾmnŋwj", syllable, 1) {
 					// f/s + other consonent
 					breakdown += romanization2[nth_rune(syllable, 1)]
 					syllable = syllable[1+len(nth_rune(syllable, 1)):]
@@ -163,7 +173,7 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 					// f/s without a cluster
 					syllable = syllable[1:]
 				}
-			} else if has("ptk", nth_rune(syllable, 0)) {
+			} else if has("ptk", syllable, 0) {
 				if nth_rune(syllable, 1) == "'" {
 					// ejective
 					breakdown += romanization2[syllable[0:2]]
@@ -173,11 +183,11 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 					breakdown += romanization2[string(syllable[0])]
 					syllable = syllable[1:]
 				}
-			} else if has("ʔlɾhmnŋvwjzbdg", nth_rune(syllable, 0)) {
+			} else if has("ʔlɾhmnŋvwjzbdg", syllable, 0) {
 				// other normal onset
 				breakdown += romanization2[nth_rune(syllable, 0)]
 				syllable = syllable[len(nth_rune(syllable, 0)):]
-			} else if has("ʃʒ", nth_rune(syllable, 0)) {
+			} else if has("ʃʒ", syllable, 0) {
 				// one sound representd as a cluster
 				if nth_rune(syllable, 0) == "ʃ" {
 					breakdown += "sh"
@@ -189,11 +199,11 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 			 * Nucleus
 			 */
 			psuedovowel := false
-			if len(syllable) > 1 && has("jw", nth_rune(syllable, 1)) {
+			if len(syllable) > 1 && has("jw", syllable, 1) {
 				//diphthong
 				breakdown += romanization2[syllable[0:len(nth_rune(syllable, 0))+1]]
 				syllable = string([]rune(syllable)[2:])
-			} else if len(syllable) > 1 && has("lr", nth_rune(syllable, 0)) {
+			} else if len(syllable) > 1 && has("lr", syllable, 0) {
 				// psuedovowel
 				breakdown += romanization2[syllable[0:3]]
 				psuedovowel = true
