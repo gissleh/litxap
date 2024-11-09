@@ -57,14 +57,16 @@ func has(word string, character string) (output bool) {
 }
 
 // Helper function to get phonetic transcriptions of secondary pronunciations
-func RomanizeIPA(IPA string) ([]string, [][]int) {
+func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 	stressMarkers := [][]int{}
 	// now Romanize the IPA
 	IPA = strings.ReplaceAll(IPA, "ʊ", "u")
 	IPA = strings.ReplaceAll(IPA, "õ", "o") // vonvä' as võvä' only
 	word := strings.Split(IPA, " ")
 
-	results := []string{""}
+	results := [][]string{{}}
+
+	bigResults := [][][]string{}
 
 	// Make sure it's not the same word with different stresses
 	if len(word) > 2 {
@@ -82,14 +84,13 @@ func RomanizeIPA(IPA string) ([]string, [][]int) {
 
 	// get the last one only
 	for j := 0; j < len(word); j++ {
-		breakdown := ""
 
 		word[j] = strings.ReplaceAll(word[j], "[", "")
 		word[j] = strings.ReplaceAll(word[j], "]", "")
 		// "or" means there's more than one IPA in this word, and we only want one
 		if word[j] == "or" {
-			results = append(results, breakdown)
-			breakdown = ""
+			bigResults = append(bigResults, results)
+			results = [][]string{{}}
 			stressMarkers = append(stressMarkers, []int{})
 			continue
 		}
@@ -102,6 +103,7 @@ func RomanizeIPA(IPA string) ([]string, [][]int) {
 
 		/* Onset */
 		for k := 0; k < len(syllables); k++ {
+			breakdown := ""
 
 			stressed := strings.Contains(syllables[k], "ˈ")
 
@@ -186,13 +188,15 @@ func RomanizeIPA(IPA string) ([]string, [][]int) {
 			/*
 			 * Nucleus
 			 */
+			psuedovowel := false
 			if len(syllable) > 1 && has("jw", nth_rune(syllable, 1)) {
 				//diphthong
 				breakdown += romanization2[syllable[0:len(nth_rune(syllable, 0))+1]]
 				syllable = string([]rune(syllable)[2:])
 			} else if len(syllable) > 1 && has("lr", nth_rune(syllable, 0)) {
+				// psuedovowel
 				breakdown += romanization2[syllable[0:3]]
-				continue
+				psuedovowel = true
 			} else {
 				//vowel
 				breakdown += romanization2[nth_rune(syllable, 0)]
@@ -202,7 +206,7 @@ func RomanizeIPA(IPA string) ([]string, [][]int) {
 			/*
 			 * Coda
 			 */
-			if len(syllable) > 0 {
+			if !psuedovowel && len(syllable) > 0 {
 				if nth_rune(syllable, 0) == "s" {
 					breakdown += "sss" //oìsss only
 				} else {
@@ -223,16 +227,16 @@ func RomanizeIPA(IPA string) ([]string, [][]int) {
 					}
 				}
 			}
+
+			results[len(results)-1] = append(results[len(results)-1], breakdown)
 		}
 
-		results[len(results)-1] += breakdown + " "
+		if j+1 < len(word) && word[j+1] != "or" {
+			results = append(results, []string{})
+		}
 	}
 
-	newResults := []string{}
+	bigResults = append(bigResults, results)
 
-	for _, a := range results {
-		newResults = append(newResults, strings.TrimRight(a, " "))
-	}
-
-	return newResults, stressMarkers
+	return bigResults, stressMarkers
 }
