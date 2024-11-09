@@ -32,6 +32,7 @@ var romanization2 = map[string]string{
 	// mistakes and rarities
 	"ʒ": "ch", "": "", " ": ""}
 
+// What is the nth rune of word?
 func nth_rune(word string, n int) string {
 	i := 0
 	for _, r := range word {
@@ -44,17 +45,17 @@ func nth_rune(word string, n int) string {
 	return ""
 }
 
+// Does ipa contain any character from word as its nth letter?
 func has(word string, ipa string, n int) (output bool) {
 	i := 0
 	for _, s := range ipa {
 		if i == n {
-			j := 0
 			for _, r := range word {
 				if r == s {
 					return true
 				}
 			}
-			j += 1
+			break // save a few compute cycles
 		}
 		i += 1
 	}

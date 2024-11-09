@@ -12,22 +12,23 @@ func TestRomanize(t *testing.T) {
 		expected [][][]string
 		stress   [][]int
 	}{
-		// Ordinary words
-		{"tɪ.ˈfmɛ.tok̚", [][][]string{{{"tì", "fme", "tok"}}}, [][]int{{1}}},
-		{"u.ˈvan", [][][]string{{{"u", "van"}}}, [][]int{{1}}},
-		{"ˈu.ɾan", [][][]string{{{"u", "ran"}}}, [][]int{{0}}},
+		// One syllable
 		{"ʔawk'", [][][]string{{{"'awkx"}}}, [][]int{{-1}}},
 		{"fko", [][][]string{{{"fko"}}}, [][]int{{-1}}},
 		{"mo", [][][]string{{{"mo"}}}, [][]int{{-1}}},
 		{"t'on", [][][]string{{{"txon"}}}, [][]int{{-1}}},
 		{"t͡sam", [][][]string{{{"tsam"}}}, [][]int{{-1}}},
 		{"fpom", [][][]string{{{"fpom"}}}, [][]int{{-1}}},
-		{"ˈt·a.ɾ·on", [][][]string{{{"ta", "ron"}}}, [][]int{{0}}},
-		{"ˈʔɛ.koŋ", [][][]string{{{"'e", "kong"}}}, [][]int{{0}}},
-		{"ɛ.ˈjawɾ", [][][]string{{{"e", "yawr"}}}, [][]int{{1}}},
 		{"kṛ", [][][]string{{{"krr"}}}, [][]int{{-1}}},
 		{"k'ḷ", [][][]string{{{"kxll"}}}, [][]int{{-1}}},
 		{"po", [][][]string{{{"po"}}}, [][]int{{-1}}},
+		//Multi syllable
+		{"tɪ.ˈfmɛ.tok̚", [][][]string{{{"tì", "fme", "tok"}}}, [][]int{{1}}},
+		{"u.ˈvan", [][][]string{{{"u", "van"}}}, [][]int{{1}}},
+		{"ˈu.ɾan", [][][]string{{{"u", "ran"}}}, [][]int{{0}}},
+		{"ˈt·a.ɾ·on", [][][]string{{{"ta", "ron"}}}, [][]int{{0}}},
+		{"ˈʔɛ.koŋ", [][][]string{{{"'e", "kong"}}}, [][]int{{0}}},
+		{"ɛ.ˈjawɾ", [][][]string{{{"e", "yawr"}}}, [][]int{{1}}},
 		// Flexible syllable stress
 		{"aj.ˈfo] or [ˈaj.fo", [][][]string{{{"ay", "fo"}}}, [][]int{{-1}}},
 		{"ˈɪ.læ] or [ɪ.ˈlæ", [][][]string{{{"ì", "lä"}}}, [][]int{{-1}}},
