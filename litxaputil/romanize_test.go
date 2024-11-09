@@ -13,6 +13,7 @@ func TestRomanize(t *testing.T) {
 		stress   [][]int
 	}{
 		// One syllable
+		{"ɛ", [][][]string{{{"e"}}}, [][]int{{-1}}},
 		{"ʔawk'", [][][]string{{{"'awkx"}}}, [][]int{{-1}}},
 		{"fko", [][][]string{{{"fko"}}}, [][]int{{-1}}},
 		{"mo", [][][]string{{{"mo"}}}, [][]int{{-1}}},
@@ -22,6 +23,7 @@ func TestRomanize(t *testing.T) {
 		{"kṛ", [][][]string{{{"krr"}}}, [][]int{{-1}}},
 		{"k'ḷ", [][][]string{{{"kxll"}}}, [][]int{{-1}}},
 		{"po", [][][]string{{{"po"}}}, [][]int{{-1}}},
+		{"sk'awŋ", [][][]string{{{"skxawng"}}}, [][]int{{-1}}},
 		//Multi syllable
 		{"tɪ.ˈfmɛ.tok̚", [][][]string{{{"tì", "fme", "tok"}}}, [][]int{{1}}},
 		{"u.ˈvan", [][][]string{{{"u", "van"}}}, [][]int{{1}}},
@@ -30,11 +32,11 @@ func TestRomanize(t *testing.T) {
 		{"ˈʔɛ.koŋ", [][][]string{{{"'e", "kong"}}}, [][]int{{0}}},
 		{"ɛ.ˈjawɾ", [][][]string{{{"e", "yawr"}}}, [][]int{{1}}},
 		// Flexible syllable stress
-		{"aj.ˈfo] or [ˈaj.fo", [][][]string{{{"ay", "fo"}}}, [][]int{{-1}}},
-		{"ˈɪ.læ] or [ɪ.ˈlæ", [][][]string{{{"ì", "lä"}}}, [][]int{{-1}}},
-		{"ˈmɪ.fa] or [mɪ.ˈfa", [][][]string{{{"mì", "fa"}}}, [][]int{{-1}}},
-		{"ˈt͡sa.kɛm] or [t͡sa.ˈkɛm", [][][]string{{{"tsa", "kem"}}}, [][]int{{-1}}},
-		{"t͡sa.ˈt͡sɛŋ] or [ˈt͡sa.t͡sɛŋ", [][][]string{{{"tsa", "tseng"}}}, [][]int{{-1}}},
+		{"aj.ˈfo] or [ˈaj.fo", [][][]string{{{"ay", "fo"}}, {{"ay", "fo"}}}, [][]int{{1}, {0}}},
+		{"ˈɪ.læ] or [ɪ.ˈlæ", [][][]string{{{"ì", "lä"}}, {{"ì", "lä"}}}, [][]int{{0}, {1}}},
+		{"ˈmɪ.fa] or [mɪ.ˈfa", [][][]string{{{"mì", "fa"}}, {{"mì", "fa"}}}, [][]int{{0}, {1}}},
+		{"ˈt͡sa.kɛm] or [t͡sa.ˈkɛm", [][][]string{{{"tsa", "kem"}}, {{"tsa", "kem"}}}, [][]int{{0}, {1}}},
+		{"t͡sa.ˈt͡sɛŋ] or [ˈt͡sa.t͡sɛŋ", [][][]string{{{"tsa", "tseng"}}, {{"tsa", "tseng"}}}, [][]int{{1}, {0}}},
 		// Multiple pronunciation
 		{"nɪ.aw.ˈno.mʊm] or [naw.ˈno.mʊm", [][][]string{{{"nì", "aw", "no", "mum"}}, {{"naw", "no", "mum"}}}, [][]int{{2}, {1}}},
 		{"nɪ.aj.ˈwɛŋ] or [naj.ˈwɛŋ", [][][]string{{{"nì", "ay", "weng"}}, {{"nay", "weng"}}}, [][]int{{2}, {1}}},
@@ -46,7 +48,7 @@ func TestRomanize(t *testing.T) {
 		{"ˈnɪ.ˌju ˈjoɾ.kɪ", [][][]string{{{"nì", "yu"}, {"yor", "kì"}}}, [][]int{{0, 0}}},
 		{"t͡sawl sl·u", [][][]string{{{"tsawl"}, {"slu"}}}, [][]int{{-1, -1}}},
 		// Empty string
-		{"", [][][]string{{{}}}, [][]int{{}}},
+		{"", [][][]string{}, [][]int{}},
 	}
 
 	for _, row := range table {

@@ -65,6 +65,11 @@ func has(word string, ipa string, n int) (output bool) {
 
 // Helper function to get phonetic transcriptions of secondary pronunciations
 func RomanizeIPA(IPA string) ([][][]string, [][]int) {
+	// Special case: empty string
+	if len(IPA) < 1 {
+		return [][][]string{}, [][]int{}
+	}
+
 	stressMarkers := [][]int{}
 	// now Romanize the IPA
 	IPA = strings.ReplaceAll(IPA, "ʊ", "u")
@@ -75,14 +80,15 @@ func RomanizeIPA(IPA string) ([][][]string, [][]int) {
 
 	bigResults := [][][]string{}
 
-	// Make sure it's not the same word with different stresses
+	// For "] or [" in the IPA
 	if len(word) > 2 {
 		word[0] = strings.ReplaceAll(word[0], "]", "")
 		word[2] = strings.ReplaceAll(word[2], "[", "")
 
-		if strings.ReplaceAll(word[0], "ˈ", "") == strings.ReplaceAll(word[2], "ˈ", "") {
+		// Make sure it's not the same word with different stresses
+		/*if strings.ReplaceAll(word[0], "ˈ", "") == strings.ReplaceAll(word[2], "ˈ", "") {
 			word = []string{strings.ReplaceAll(word[0], "ˈ", "")}
-		}
+		}*/
 	}
 
 	stressMarkers = append(stressMarkers, []int{})
