@@ -1,6 +1,10 @@
 package litxaputil
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+	"unicode/utf8"
+)
 
 func ApplyLenition(current string) (lenition string, next string) {
 	switch {
@@ -27,8 +31,11 @@ func ApplyLenition(current string) (lenition string, next string) {
 		next = "f" + current[1:]
 	case strings.HasPrefix(current, "'l"), strings.HasPrefix(current, "'r"):
 		next = current
+	case current == "'":
+		next = current
 	case strings.HasPrefix(current, "'"):
-		lenition = current[0:2] + "→" + current[1:2]
+		firstCh, _ := utf8.DecodeRuneInString(current[len("'"):])
+		lenition = fmt.Sprintf("'%c→%c", firstCh, firstCh)
 		next = current[1:]
 	default:
 		next = current
