@@ -34,6 +34,8 @@ func TestApplySuffixes(t *testing.T) {
 		{"po", "r", "por"},
 		{"'e.kong", "ä", "'e.ko.ngä"},
 		{"'e.kong", "teri", "'e.kong.te.ri"},
+		{"uvan.si", "teri,yu", "uvan.te.ri.si.yu"},
+		{"uvan.si", "tswo", "uvan.tswo"},
 	}
 
 	for _, row := range table {
@@ -53,5 +55,6 @@ func TestApplySuffixes_Panic(t *testing.T) {
 		syllableSplit: []string{"blarg"},
 	}
 	assert.Panics(t, func() { badSuffix.Apply([]string{"stuff"}) })
+	assert.Panics(t, func() { badSuffix.Apply([]string{}) })
 	assert.Panics(t, func() { findSuffix("teri").Apply([]string{}) })
 }

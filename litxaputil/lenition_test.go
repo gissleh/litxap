@@ -12,6 +12,7 @@ func TestApplyLenition(t *testing.T) {
 		Next     string
 	}{
 		{"", "", ""},
+		{"'", "", "'"},
 		{"kilvan", "k→h", "hilvan"},
 		{"tsìlpey", "ts→s", "sìlpey"},
 		{"tìtok", "t→s", "sìtok"},

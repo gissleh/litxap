@@ -63,9 +63,24 @@ func (suffix Suffix) Apply(curr []string) []string {
 // ApplySuffixes applies the suffixes to the syllable set. None of them change stress (yet), so the stress index
 // shall remain the same before and after.
 func ApplySuffixes(curr []string, suffixNames []string) []string {
+	siVerb := curr[len(curr)-1] == "si"
+	droppedSi := false
+
 	for _, suffixName := range suffixNames {
 		suffix := findSuffix(suffixName)
-		curr = suffix.Apply(curr)
+
+		if siVerb && !droppedSi && suffixName != "yu" {
+			droppedSi = true
+			curr = suffix.Apply(curr[:len(curr)-1])
+		} else if siVerb && suffixName == "yu" {
+			if droppedSi {
+				curr = append(curr, "si")
+			}
+
+			curr = suffix.Apply(curr)
+		} else {
+			curr = suffix.Apply(curr)
+		}
 	}
 
 	return curr
