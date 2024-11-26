@@ -64,23 +64,33 @@ func (suffix Suffix) Apply(curr []string) []string {
 // shall remain the same before and after.
 func ApplySuffixes(curr []string, suffixNames []string) []string {
 	siVerb := curr[len(curr)-1] == "si"
-	droppedSi := false
+	hasTswo := false
+	hasYu := false
+	siPos := len(curr) - 1
+	if siVerb {
+		curr = curr[:len(curr)-1]
+	}
 
 	for _, suffixName := range suffixNames {
 		suffix := findSuffix(suffixName)
 
-		if siVerb && !droppedSi && suffixName != "yu" {
-			droppedSi = true
-			curr = suffix.Apply(curr[:len(curr)-1])
-		} else if siVerb && suffixName == "yu" {
-			if droppedSi {
-				curr = append(curr, "si")
-			}
-
+		if siVerb && suffixName == "tswo" {
 			curr = suffix.Apply(curr)
+			hasTswo = true
+		} else if siVerb && suffixName == "yu" {
+			curr = suffix.Apply(curr)
+			hasYu = true
 		} else {
 			curr = suffix.Apply(curr)
+			if siVerb && !hasYu {
+				siPos = len(curr)
+			}
 		}
+	}
+
+	if siVerb && !hasTswo {
+		curr = append(curr[:siPos+1], curr[siPos:]...)
+		curr[siPos] = "si"
 	}
 
 	return curr

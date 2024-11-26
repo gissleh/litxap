@@ -34,8 +34,13 @@ func TestApplySuffixes(t *testing.T) {
 		{"po", "r", "por"},
 		{"'e.kong", "ä", "'e.ko.ngä"},
 		{"'e.kong", "teri", "'e.kong.te.ri"},
-		{"uvan.si", "teri,yu", "uvan.te.ri.si.yu"},
-		{"uvan.si", "tswo", "uvan.tswo"},
+		{"u.van.si", "yu", "u.van.si.yu"},
+		{"u.van.si", "yu,o,ti", "u.van.si.yu.o.ti"},
+		{"u.van.si", "yu,o,t", "u.van.si.yu.ot"},
+		{"u.van.si", "tswo", "u.van.tswo"},
+		{"u.van.si", "teri,yu,l", "u.van.te.ri.si.yul"}, // not grammatically correct
+		{"u.van.si", "teri,yu", "u.van.te.ri.si.yu"},    // not grammatically correct
+		{"u.van.si", "o,tswo,ti", "u.va.no.tswo.ti"},    // not grammatically correct
 	}
 
 	for _, row := range table {
