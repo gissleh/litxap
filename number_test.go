@@ -18,6 +18,7 @@ func TestNumberDictionary_LookupEntries(t *testing.T) {
 		{"mevozam", "me.vo.zam: : Number °2000 (1024)"},
 		{"mevozave", "me.vo.za.ve: : Ordinal number °2000 (1024)"},
 		{"mrrvomrr", "mrr.vo.*mrr: : Number °55 (45)"},
+		{"mrrvozam", "mrr.vo.zam: : Number °5000 (2560)"},
 		{"mrrvozavol", "mrr.vo.za.*vol: : Number °5010 (2568)"},
 		{"mrrvozamevol", "mrr.vo.za.*me.vol: : Number °5020 (2576)"},
 		{"mezavolaw", "me.za.vo.*law: : Number °211 (137)"},
