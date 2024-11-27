@@ -28,15 +28,14 @@ func GenerateNumber(number int, ordinal bool) (syllables []string, stress int, o
 			digit := number / powerValue
 			number %= powerValue
 
-			stress = len(syllables)
 			if len(syllables) > 0 {
 				syllables = syllables[:len(syllables)-1]
 			}
-			if len(numberPowers[i]) == 3 {
-				stress += 1
-			}
 			if numberPrefixes[digit] != "" {
 				syllables = append(syllables, numberPrefixes[digit])
+				stress = len(syllables) - 1
+			} else {
+				stress = len(syllables)
 			}
 			syllables = append(syllables, numberPowers[i]...)
 		}
