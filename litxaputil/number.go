@@ -67,6 +67,10 @@ func GenerateNumber(number int, ordinal bool) (syllables []string, stress int, o
 		}
 	}
 
+	if number%8 == 0 {
+		stress = 0
+	}
+
 	ok = true
 	return
 }

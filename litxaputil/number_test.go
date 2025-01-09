@@ -60,7 +60,7 @@ func TestNaviNumber(t *testing.T) {
 		},
 		{
 			number: 0o43270, ordinal: false,
-			resSyllables: "tsì.za.za.pxe.vo.za.me.za.ki.vol", resStress: 8,
+			resSyllables: "tsì.za.za.pxe.vo.za.me.za.ki.vol", resStress: 0,
 		},
 		{
 			number: 0o43272, ordinal: false,
@@ -72,11 +72,11 @@ func TestNaviNumber(t *testing.T) {
 		},
 		{
 			number: 0o5010, ordinal: false,
-			resSyllables: "mrr.vo.za.vol", resStress: 3,
+			resSyllables: "mrr.vo.za.vol", resStress: 0,
 		},
 		{
 			number: 0o5020, ordinal: false,
-			resSyllables: "mrr.vo.za.me.vol", resStress: 3,
+			resSyllables: "mrr.vo.za.me.vol", resStress: 0,
 		},
 	}
 
