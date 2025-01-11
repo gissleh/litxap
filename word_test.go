@@ -74,6 +74,10 @@ func TestRunWord(t *testing.T) {
 			Res: "na.ri. .sey.ki", ResStress: 0,
 		},
 		{
+			Raw: "srung-susia", Entry: "*srung.s··i: <us> -a",
+			Res: "srung.-su.si.a", ResStress: 0,
+		},
+		{
 			Raw: "kemtsyìposiyu", Entry: "*kem.si: -tsyìp-o-yu",
 			Res: "kem.tsyì.po.si.yu", ResStress: 0,
 		},

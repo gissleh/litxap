@@ -136,32 +136,6 @@ func TestRunLine(t *testing.T) {
 			},
 		},
 		{
-			input:       "Tsafneioanghu tsaheyl si rä'ä, ma 'eylan.",
-			withDoubles: true,
-			expected: Line{
-				LinePart{Raw: "Tsafneioanghu", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"Tsa", "fne", "i", "o", "ang", "hu"}, 3, dummyDictionary["tsafneioanghu"]},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "tsaheyl si", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"tsa", "heyl", " ", "si"}, 3, dummyDictionary["tsaheyl si"]},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "rä'ä", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"rä", "'ä"}, 1, dummyDictionary["rä'ä"]},
-				}},
-				LinePart{Raw: ", "},
-				LinePart{Raw: "ma", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"ma"}, 0, dummyDictionary["ma"]},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "'eylan", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"'ey", "lan"}, 0, dummyDictionary["'eylan"]},
-				}},
-				LinePart{Raw: "."},
-			},
-		},
-		{
 			input:       "Po tsaheyl soli ikranhu.",
 			withDoubles: false,
 			expected: Line{

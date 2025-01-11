@@ -16,6 +16,8 @@ type Suffix struct {
 	// first: will end the last syllable
 	// non-first: always its own syllable
 	syllableSplit []string
+	// After si
+	afterSi bool
 }
 
 func (suffix Suffix) Apply(curr []string) []string {
@@ -60,13 +62,16 @@ func (suffix Suffix) Apply(curr []string) []string {
 	}
 }
 
+func (suffix Suffix) isAfterSi() Suffix {
+	suffix.afterSi = true
+	return suffix
+}
+
 // ApplySuffixes applies the suffixes to the syllable set. None of them change stress (yet), so the stress index
 // shall remain the same before and after.
 func ApplySuffixes(curr []string, suffixNames []string) []string {
 	siVerb := curr[len(curr)-1] == "si"
-	hasTswo := false
-	hasYu := false
-	siPos := len(curr) - 1
+	siApplied := false
 	if siVerb {
 		curr = curr[:len(curr)-1]
 	}
@@ -76,21 +81,14 @@ func ApplySuffixes(curr []string, suffixNames []string) []string {
 
 		if siVerb && suffixName == "tswo" {
 			curr = suffix.Apply(curr)
-			hasTswo = true
-		} else if siVerb && suffixName == "yu" {
+			siApplied = true
+		} else if siVerb && suffix.afterSi && !siApplied {
+			curr = append(curr, "si")
 			curr = suffix.Apply(curr)
-			hasYu = true
+			siApplied = true
 		} else {
 			curr = suffix.Apply(curr)
-			if siVerb && !hasYu {
-				siPos = len(curr)
-			}
 		}
-	}
-
-	if siVerb && !hasTswo {
-		curr = append(curr[:siPos+1], curr[siPos:]...)
-		curr[siPos] = "si"
 	}
 
 	return curr
@@ -117,7 +115,7 @@ var attachableCores = []string{"aw", "ay", "ew", "ey", "a", "ä", "e", "é", "i"
 var suffixMap = map[string]Suffix{
 	"tswo":  suffix(sraNewSyllable, "tswo"),
 	"tsyìp": suffix(sraNewSyllable, "tsyìp"),
-	"yu":    suffix(sraNewSyllable, "yu"),
+	"yu":    suffix(sraNewSyllable, "yu").isAfterSi(),
 	"fkeyk": suffix(sraNewSyllable, "fkeyk"),
 	"tseng": suffix(sraNewSyllable, "tseng"),
 
@@ -146,7 +144,7 @@ var suffixMap = map[string]Suffix{
 	"ftumfa":  suffix(sraNewSyllable, "ftum", "fa"),
 	"ftuopa":  suffix(sraNewSyllable, "ftu", "o", "pa"),
 
-	"a": suffix(sraStealCoda, "a"),
+	"a": suffix(sraStealCoda, "a").isAfterSi(),
 	"o": suffix(sraStealCoda, "o"),
 
 	"l":                suffix(sraAttach, "l"),
