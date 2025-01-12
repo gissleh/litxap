@@ -151,8 +151,8 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		}
 	}
 
-	// Check lenition if permitted
-	if allowLenition {
+	// Check lenition if permitted (edge case: ' for reef)
+	if allowLenition || strings.HasPrefix(syllables[0], "'") {
 		if _, lenitedSyllable := ApplyLenition(syllables[0]); strings.HasPrefix(currLower, lenitedSyllable) {
 			return []string{curr[:len(lenitedSyllable)]}, curr[len(lenitedSyllable):], 1, 1
 		}
