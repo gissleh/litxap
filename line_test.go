@@ -200,11 +200,25 @@ func TestParseLine(t *testing.T) {
 			expected: Line{
 				LinePart{Raw: "spono-o", IsWord: true},
 				LinePart{Raw: " "},
-				LinePart{Raw: "aean", IsWord: true},
+				LinePart{Raw: "a", IsWord: true},
+				LinePart{Raw: "ean", IsWord: true},
 				LinePart{Raw: "-"},
 				LinePart{Raw: "na", IsWord: true},
 				LinePart{Raw: "-"},
 				LinePart{Raw: "pay", IsWord: true},
+			},
+		},
+		{
+			input: "ean-na-ta'lenga tute",
+			expected: Line{
+				LinePart{Raw: "ean", IsWord: true},
+				LinePart{Raw: "-"},
+				LinePart{Raw: "na", IsWord: true},
+				LinePart{Raw: "-"},
+				LinePart{Raw: "ta'leng", IsWord: true},
+				LinePart{Raw: "a", IsWord: true},
+				LinePart{Raw: " "},
+				LinePart{Raw: "tute", IsWord: true},
 			},
 		},
 		{

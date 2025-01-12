@@ -105,19 +105,30 @@ func ParseLine(s string) Line {
 			lastPipe = currentPos
 		} else if ch == '\n' || wordMode != (unicode.IsLetter(ch) || ch == '\'' || ch == '-') {
 			if lastPos != currentPos {
-				if wordMode && strings.Contains(s[lastPos:currentPos], "-na-") {
-					split := strings.SplitN(s[lastPos:currentPos], "-na-", 2)
-					res = append(res, LinePart{
-						Raw: split[0], IsWord: true, Matches: nil,
-					}, LinePart{
-						Raw: "-",
-					}, LinePart{
-						Raw: "na", IsWord: true, Matches: nil,
-					}, LinePart{
-						Raw: "-",
-					}, LinePart{
-						Raw: split[1], IsWord: true, Matches: nil,
-					})
+				// Colors
+				if wordMode && strings.Contains(s[lastPos:currentPos], "-") && strings.Contains(s[lastPos:currentPos], "na") {
+					split := strings.Split(s[lastPos:currentPos], "-")
+					for i, token := range split {
+						if i > 0 {
+							res = append(res, LinePart{Raw: "-"})
+						}
+
+						if i == 0 && strings.HasPrefix(token, "a") {
+							res = append(res, LinePart{Raw: "a", IsWord: true})
+							token = strings.TrimPrefix(token, "a")
+						}
+
+						hasAttrSuffix := false
+						if i == len(split)-1 && strings.HasSuffix(token, "a") {
+							token = strings.TrimSuffix(token, "a")
+							hasAttrSuffix = true
+						}
+
+						res = append(res, LinePart{Raw: token, IsWord: true})
+						if hasAttrSuffix {
+							res = append(res, LinePart{Raw: "a", IsWord: true})
+						}
+					}
 				} else {
 					raw := s[lastPos:currentPos]
 					lookup := s[lastPos:lastPos]
