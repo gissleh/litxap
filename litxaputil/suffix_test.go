@@ -32,8 +32,10 @@ func TestApplySuffixes(t *testing.T) {
 		{"krr", "o", "krr.o"},
 		{"kxll", "ä", "kxll.ä"},
 		{"po", "r", "por"},
+		{"si", "", "si"},
 		{"'e.kong", "ä", "'e.ko.ngä"},
 		{"'e.kong", "teri", "'e.kong.te.ri"},
+		{"u.van.si", "", "u.van.si"},
 		{"u.van.si", "yu", "u.van.si.yu"},
 		{"u.van.si", "yu,o,ti", "u.van.si.yu.o.ti"},
 		{"u.van.si", "yu,o,t", "u.van.si.yu.ot"},
@@ -49,6 +51,10 @@ func TestApplySuffixes(t *testing.T) {
 		t.Run(fmt.Sprintf("%s -%s", row.curr, row.suffixes), func(t *testing.T) {
 			curr := strings.Split(row.curr, ".")
 			suffixes := strings.Split(row.suffixes, ",")
+			if row.suffixes == "" {
+				suffixes = []string{}
+			}
+
 			next := ApplySuffixes(curr, suffixes)
 
 			assert.Equal(t, row.expected, strings.Join(next, "."))

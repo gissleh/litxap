@@ -70,6 +70,10 @@ func (suffix Suffix) isAfterSi() Suffix {
 // ApplySuffixes applies the suffixes to the syllable set. None of them change stress (yet), so the stress index
 // shall remain the same before and after.
 func ApplySuffixes(curr []string, suffixNames []string) []string {
+	if len(suffixNames) == 0 {
+		return curr
+	}
+
 	siVerb := curr[len(curr)-1] == "si"
 	siApplied := false
 	if siVerb {
