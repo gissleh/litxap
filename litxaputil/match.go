@@ -100,6 +100,15 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		}
 	}
 
+	// Edge case: tsaw + yä -> tseyä
+	if len(syllables) == 2 && strings.HasSuffix(syllables[0], "aw") && syllables[1] == "yä" {
+		if strings.HasPrefix(currLower, "tseyä") {
+			l0 := len("tse")
+			l1 := len("tseyä")
+			return []string{curr[:l0], curr[l0:l1]}, curr[l1:], 2, 2
+		}
+	}
+
 	if strings.ContainsRune(currLower, '-') && !strings.HasSuffix(syllables[0], "-") {
 		prev0 := syllables[0]
 		syllables[0] = syllables[0] + "-"

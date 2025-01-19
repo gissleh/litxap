@@ -33,15 +33,10 @@ var dummyDictionary = DummyDictionary{
 	"ikranhu":       *ParseEntry("ik.ran: -hu"),
 }
 
-var mustDouble = map[string]string{
-	"tsaheyl": "si",
-}
-
 func TestRunLine(t *testing.T) {
 	table := []struct {
-		input       string
-		expected    Line
-		withDoubles bool
+		input    string
+		expected Line
 	}{
 		{
 			input: "Kaltxì, ma fmetokyu!",
@@ -136,8 +131,7 @@ func TestRunLine(t *testing.T) {
 			},
 		},
 		{
-			input:       "Po tsaheyl soli ikranhu.",
-			withDoubles: false,
+			input: "Po tsaheyl soli ikranhu.",
 			expected: Line{
 				LinePart{Raw: "Po", IsWord: true, Matches: []LinePartMatch{
 					{[]string{"Po"}, 0, dummyDictionary["po"]},
@@ -163,11 +157,7 @@ func TestRunLine(t *testing.T) {
 		t.Run(row.input, func(t *testing.T) {
 			var res Line
 			var err error
-			if row.withDoubles {
-				res, err = ParseLine(row.input).Merge(mustDouble).Run(dummyDictionary)
-			} else {
-				res, err = RunLine(row.input, dummyDictionary)
-			}
+			res, err = RunLine(row.input, dummyDictionary)
 			assert.NoError(t, err)
 			assert.Equal(t, row.expected, res)
 		})
