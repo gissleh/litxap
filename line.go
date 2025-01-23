@@ -73,7 +73,6 @@ func (line Line) UnStressSiVerbParts(dict Dictionary) Line {
 				}
 
 				// Check if it's a si-verb
-				log.Println(line[p2].Raw + " " + line[i].Raw)
 				if entries, _ := dict.LookupEntries(line[p2].Raw + " " + line[i].Raw); len(entries) == 0 {
 					continue
 				}
