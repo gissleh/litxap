@@ -101,7 +101,6 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 						}
 					}
 				}
-
 			}
 		}
 	}
@@ -124,6 +123,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		}
 	}
 
+	// Edge case: srung-susia
 	if strings.ContainsRune(currLower, '-') && !strings.HasSuffix(syllables[0], "-") {
 		prev0 := syllables[0]
 		syllables[0] = syllables[0] + "-"
@@ -238,12 +238,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 			if strings.HasPrefix(currLower, syllables[0][:l0-1]+"e"+syllables[1]) {
 				return []string{curr[:l0], curr[l0 : l0+l1]}, curr[l0+l1:], 2, 2
 			}
-		} else if syllables[1] == "y" {
-			if strings.HasPrefix(currLower, syllables[0][:l0-1]+"e"+syllables[1]) {
-				return []string{curr[:l0+l1]}, curr[l0+l1:], 2, 2
-			}
 		}
-
 	}
 
 	// Edge case: tsaw.ta -> tsa.ta
@@ -254,6 +249,15 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 
 		if strings.HasPrefix(currLower, check) {
 			return []string{curr[:l0], curr[l0 : l0+l1]}, curr[l0+l1:], 2, 2
+		}
+	}
+
+	for _, alt := range [2]string{"ay", "oy"} {
+		if strings.HasSuffix(syllables[0], alt) {
+			s0 := strings.Replace(syllables[0], alt, "ey", 1)
+			if strings.HasPrefix(currLower, s0) {
+				return []string{curr[:len(s0)]}, curr[len(s0):], 1, 1
+			}
 		}
 	}
 
