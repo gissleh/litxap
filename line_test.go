@@ -35,6 +35,8 @@ var dummyDictionary = DummyDictionary{
 	"a":             *ParseEntry("a"),
 	"uvan":          *ParseEntry("u.*van"),
 	"uvan soli":     *ParseEntry("u.*van si: <ol>"),
+	"po soli":       *ParseEntry("po"),
+	"po soli:0":     *ParseEntry("si: <ol>"),
 }
 
 func TestRunLine(t *testing.T) {
@@ -386,12 +388,12 @@ func TestLine_UnStressSiVerbParts_SubClause(t *testing.T) {
 			{[]string{"a"}, 0, dummyDictionary["a"], false},
 		}},
 		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
 		LinePart{Raw: "po", IsWord: true, Matches: []LinePartMatch{
 			{[]string{"po"}, 0, dummyDictionary["po"], false},
+		}},
+		LinePart{Raw: " "},
+		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
 		}},
 		LinePart{Raw: " "},
 		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{

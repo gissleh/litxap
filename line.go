@@ -72,7 +72,14 @@ func (line Line) UnStressSiVerbParts(dict Dictionary) Line {
 				}
 
 				// Check if it's a si-verb
-				if entries, _ := dict.LookupEntries(line[p2].Raw + " " + line[i].Raw); len(entries) == 0 {
+				entries, _ := dict.LookupEntries(line[p2].Raw + " " + line[i].Raw)
+				foundSiVerb := false
+				for _, entry := range entries {
+					if strings.HasSuffix(entry.Word, " si") || strings.HasSuffix(entry.Word, " säpi") || strings.HasSuffix(entry.Word, " seyki") || strings.HasSuffix(entry.Word, " säpeyki") {
+						foundSiVerb = true
+					}
+				}
+				if !foundSiVerb {
 					continue
 				}
 
