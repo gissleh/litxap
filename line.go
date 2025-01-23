@@ -3,6 +3,7 @@ package litxap
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -38,6 +39,7 @@ func (line Line) Run(dict Dictionary) (Line, error) {
 			return nil, fmt.Errorf("failed to lookup \"%s\": %w", lookup, err)
 		}
 
+		newLine[i].Matches = make([]LinePartMatch, 0, len(results))
 		for _, result := range results {
 			syllables, stress := RunWord(part.Raw, result)
 			if syllables != nil {
@@ -51,6 +53,76 @@ func (line Line) Run(dict Dictionary) (Line, error) {
 	}
 
 	return newLine, nil
+}
+
+func (line Line) UnStressSiVerbParts(dict Dictionary) Line {
+	isCopied := false
+	newLine := line
+
+	for i, part := range line {
+		if part.matchesWord("si") {
+			if p := line.prevWord(i); p != -1 {
+				p2 := p
+				isKe := line[p].matchesWord("ke")
+				isRaa := line[p].matchesWord("rä'ä")
+				if isKe || isRaa {
+					p2 = line.prevWord(p)
+					if p2 == -1 {
+						continue
+					}
+				}
+
+				// Check if it's a si-verb
+				log.Println(line[p2].Raw + " " + line[i].Raw)
+				if entries, _ := dict.LookupEntries(line[p2].Raw + " " + line[i].Raw); len(entries) == 0 {
+					continue
+				}
+
+				if !isCopied {
+					isCopied = true
+					newLine = append(newLine[:0:0], newLine...)
+					for j := range newLine {
+						newLine[j].Matches = append(newLine[j].Matches[:0:0], newLine[j].Matches...)
+					}
+				}
+
+				// Unstress the word (rä'ä might need this as well, but it's not explicitly defined)
+				if isKe {
+					for j := range line[p2].Matches {
+						newLine[p2].Matches[j].Stress = -1
+					}
+
+					// Stress the "ke"
+					for j, match := range line[p].Matches {
+						if match.Entry.Word == "ke" {
+							newLine[p].Matches[j].StressedWord = true
+							break
+						}
+					}
+				}
+
+				// Unstress the si
+				for j := range line[i].Matches {
+					newLine[i].Matches[j].Stress = -1
+				}
+			}
+		}
+	}
+
+	return newLine
+}
+
+func (line Line) prevWord(i int) int {
+	for j := i - 1; j >= 0; j-- {
+		if line[j].IsWord {
+			return j
+		} else if len(strings.Trim(line[j].Raw, "  ")) > 0 {
+			// sentence or clause boundary, most likely.
+			break
+		}
+	}
+
+	return -1
 }
 
 // ParseLine splits out the words from a line of text.
@@ -128,8 +200,19 @@ type LinePart struct {
 	Matches []LinePartMatch `json:"matches,omitempty"`
 }
 
+func (part *LinePart) matchesWord(word string) bool {
+	for _, match := range part.Matches {
+		if match.Entry.Word == word {
+			return true
+		}
+	}
+
+	return false
+}
+
 type LinePartMatch struct {
-	Syllables []string `json:"syllables"`
-	Stress    int      `json:"stress"`
-	Entry     Entry    `json:"entry"`
+	Syllables    []string `json:"syllables"`
+	Stress       int      `json:"stress"`
+	Entry        Entry    `json:"entry"`
+	StressedWord bool     `json:"stressedWord,omitempty"`
 }
