@@ -79,10 +79,9 @@ var customWordLoanWordSuffixes = []string{
 	"ä",
 }
 
-// Hardcoded adpositions for custom words. Generated using these two commands in node.js repl.
+// Hardcoded adpositions for custom words. Generated using this command in node.js repl.
 //
-// child_process.exec("fwew \"/list pos has adp\"", (_, stdout) => s = stdout);
-// JSON.stringify(s.split("\n").filter(l => l).map(l => l.split(" ")[1].replace("+", "")))
+// child_process.execSync("fwew \"/list pos has adp\"").toString().split("\n").filter(l => l).map(l => l.split(" ")[1].replace("+", ""));
 var customWordAdpositions = []string{
 	"äo", "eo", "fa", "fpi", "ftu", "hu", "ìlä", "ka", "kip", "mì", "mungwrr", "na", "ne", "ta",
 	"teri", "vay", "fkip", "io", "kxamlä", "lok", "maw", "mìkam", "nemfa", "pxaw", "pxel",

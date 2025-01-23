@@ -286,6 +286,24 @@ func TestMatchSyllables(t *testing.T) {
 			newSyllables: "TsE.yÄ",
 			newStress:    0,
 		},
+		{
+			word: "Mekxan", syllables: "me.e.kxan",
+			root: 0, stress: 2,
+			newSyllables: "Me.kxan",
+			newStress:    1,
+		},
+		{
+			word: "fìmEylan", syllables: "fì.me.'ey.lan",
+			root: 0, stress: 2,
+			newSyllables: "fì.mEy.lan",
+			newStress:    1,
+		},
+		{
+			word: "fìmeeylan", syllables: "fì.me.'ey.lan",
+			root: 0, stress: 2,
+			newSyllables: "fì.me.ey.lan",
+			newStress:    2,
+		},
 	}
 
 	for _, row := range table {
