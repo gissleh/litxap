@@ -3,7 +3,6 @@ package litxap
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"unicode"
 	"unicode/utf8"
