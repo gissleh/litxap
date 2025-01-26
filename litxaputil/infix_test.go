@@ -254,6 +254,13 @@ func TestApplyInfixes(t *testing.T) {
 
 			expectedSyllables: "ey.kìl.ma.tsi.nan", expectedStress: -1,
 		},
+		{
+			curr: "tì.ran", infixes: "eyk,ats",
+			start: 0, stress: 1,
+			positions: [2][2]int{{0, 1}, {1, 1}},
+
+			expectedSyllables: "tey.kì.ra.tsan", expectedStress: 3,
+		},
 	}
 
 	for _, row := range table {

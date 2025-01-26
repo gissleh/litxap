@@ -60,7 +60,7 @@ func ApplyInfixes(curr []string, infixNames []string, start int, stress int, pos
 
 	if infixes[0] != nil {
 		next, si2, pos2 := infixes[0].Apply(curr, positions[0][0], positions[0][1])
-		if !hasStressShift && stress == positions[0][0] {
+		if !hasStressShift && stress >= positions[0][0] {
 			stress += si2 - positions[0][0]
 		}
 
