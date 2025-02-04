@@ -41,7 +41,10 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 		positions[0][0] += offset
 		positions[1][0] += offset
 
-		syllables, stress = litxaputil.ApplyInfixes(syllables, entry.Infixes, offset, stress, positions)
+		// It is not known if this affects aho.
+		hasStressShift := entry.Word == "inan" || entry.Word == "omum"
+
+		syllables, stress = litxaputil.ApplyInfixes(syllables, entry.Infixes, offset, stress, positions, hasStressShift)
 	}
 
 	syllables = litxaputil.ApplySuffixes(syllables, entry.Suffixes)

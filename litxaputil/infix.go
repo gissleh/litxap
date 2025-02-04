@@ -40,7 +40,7 @@ func (i Infix) Apply(curr []string, si, pos int) ([]string, int, int) {
 	return curr, si + len(i.SyllableSplit) - 1, len(i.SyllableSplit[len(i.SyllableSplit)-1])
 }
 
-func ApplyInfixes(curr []string, infixNames []string, start int, stress int, positions [2][2]int) ([]string, int) {
+func ApplyInfixes(curr []string, infixNames []string, start int, stress int, positions [2][2]int, hasStressShift bool) ([]string, int) {
 	var infixes [3]*Infix
 	for _, infixName := range infixNames {
 		infix := FindInfix(infixName)
@@ -55,7 +55,6 @@ func ApplyInfixes(curr []string, infixNames []string, start int, stress int, pos
 		}
 	}
 
-	hasStressShift := stress > start && positions[0] == [2]int{0, 0}
 	allInfixesTogether := positions[1] == positions[0]
 
 	if infixes[0] != nil {
