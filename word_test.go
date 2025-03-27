@@ -109,6 +109,14 @@ func TestRunWord(t *testing.T) {
 			Raw: "Eraho", Entry: "·a.*h·o: <er>",
 			Res: "E.ra.ho", ResStress: 2,
 		},
+		{
+			Raw: "pxeylan", Entry: "'ey.lan: pxe-",
+			Res: "pxey.lan", ResStress: 0,
+		},
+		{
+			Raw: "ayeylan", Entry: "'ey.lan: ay-",
+			Res: "a.yey.lan", ResStress: 1,
+		},
 	}
 
 	for _, row := range table {

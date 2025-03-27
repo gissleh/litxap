@@ -11,9 +11,20 @@ type Prefix struct {
 	loseTail string
 	// syllableSplit describes how the prefix will be added.
 	syllableSplit []string
+	// hasLenition indicates that it has lenition.
+	hasLenition bool
+}
+
+func (p Prefix) withLenition() Prefix {
+	p.hasLenition = true
+	return p
 }
 
 func (p Prefix) Apply(curr []string) ([]string, int) {
+	if p.hasLenition {
+		_, curr[0] = ApplyLenition(curr[0])
+	}
+
 	curr = append(p.syllableSplit[:len(p.syllableSplit):len(p.syllableSplit)], curr...)
 
 	if p.loseTail != "" {
@@ -61,7 +72,10 @@ func findPrefix(name string) Prefix {
 var prefixMap = map[string]Prefix{
 	"tsuk":   prefix("k", "tsu"),
 	"ketsuk": prefix("k", "ke", "tsu"),
-	"ay":     prefix("y", "a"),
-	"pay":    prefix("y", "pa"),
-	"fay":    prefix("y", "fa"),
+	"pe":     prefix("", "pe").withLenition(),
+	"me":     prefix("", "me").withLenition(),
+	"pxe":    prefix("", "pxe").withLenition(),
+	"ay":     prefix("y", "a").withLenition(),
+	"pay":    prefix("y", "pa").withLenition(),
+	"fay":    prefix("y", "fa").withLenition(),
 }
