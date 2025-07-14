@@ -36,15 +36,15 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 		stress += offset
 	}
 
+	// It is not known if this affects aho.
+	if (entry.Word == "inan" || entry.Word == "omum") && (len(entry.Infixes) > 0 || len(entry.Prefixes) > 0 || len(entry.Suffixes) > 0) {
+		stress -= 1
+	}
+
 	if entry.InfixPos != nil && len(entry.Infixes) > 0 {
 		positions := *entry.InfixPos
 		positions[0][0] += offset
 		positions[1][0] += offset
-
-		// It is not known if this affects aho.
-		if (entry.Word == "inan" || entry.Word == "omum") && len(entry.Infixes) > 0 {
-			stress -= 1
-		}
 
 		syllables, stress = litxaputil.ApplyInfixes(syllables, entry.Infixes, stress, positions)
 	}

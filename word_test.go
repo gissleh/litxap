@@ -114,6 +114,14 @@ func TestRunWord(t *testing.T) {
 			Res: "E.ra.ho", ResStress: 2,
 		},
 		{
+			Raw: "TSUKinan", Entry: "·i.*n·an: tsuk-",
+			Res: "TSU.Ki.nan", ResStress: 1,
+		},
+		{
+			Raw: "inanTSWO", Entry: "·i.*n·an: -tswo",
+			Res: "i.nan.TSWO", ResStress: 0,
+		},
+		{
 			Raw: "pxeylan", Entry: "'ey.lan: pxe-",
 			Res: "pxey.lan", ResStress: 0,
 		},
