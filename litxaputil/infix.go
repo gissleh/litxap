@@ -40,7 +40,7 @@ func (i Infix) Apply(curr []string, si, pos int) ([]string, int, int) {
 	return curr, si + len(i.SyllableSplit) - 1, len(i.SyllableSplit[len(i.SyllableSplit)-1])
 }
 
-func ApplyInfixes(curr []string, infixNames []string, start int, stress int, positions [2][2]int, hasStressShift bool) ([]string, int) {
+func ApplyInfixes(curr []string, infixNames []string, stress int, positions [2][2]int) ([]string, int) {
 	var infixes [3]*Infix
 	for _, infixName := range infixNames {
 		infix := FindInfix(infixName)
@@ -55,11 +55,9 @@ func ApplyInfixes(curr []string, infixNames []string, start int, stress int, pos
 		}
 	}
 
-	allInfixesTogether := positions[1] == positions[0]
-
 	if infixes[0] != nil {
 		next, si2, pos2 := infixes[0].Apply(curr, positions[0][0], positions[0][1])
-		if !hasStressShift && stress >= positions[0][0] {
+		if stress >= positions[0][0] {
 			stress += si2 - positions[0][0]
 		}
 
@@ -69,7 +67,7 @@ func ApplyInfixes(curr []string, infixNames []string, start int, stress int, pos
 
 	if infixes[1] != nil {
 		next, si2, pos2 := infixes[1].Apply(curr, positions[0][0], positions[0][1])
-		if !hasStressShift && stress >= positions[0][0] {
+		if stress >= positions[0][0] {
 			stress += si2 - positions[0][0]
 		}
 
@@ -79,31 +77,11 @@ func ApplyInfixes(curr []string, infixNames []string, start int, stress int, pos
 
 	if infixes[2] != nil {
 		next, si2, _ := infixes[2].Apply(curr, positions[1][0], positions[1][1])
-		if !hasStressShift && stress >= positions[1][0] {
+		if stress >= positions[1][0] {
 			stress += si2 - positions[1][0]
 		}
 
 		curr = next
-	}
-
-	// Apply stress shift.
-	if hasStressShift {
-		if infixes[2] != nil && allInfixesTogether {
-			stress += len(infixes[2].SyllableSplit) - 2
-			if infixes[1] != nil {
-				stress += len(infixes[1].SyllableSplit) - 1
-			}
-			if infixes[0] != nil {
-				stress += len(infixes[0].SyllableSplit) - 1
-			}
-		} else if infixes[1] != nil {
-			stress += len(infixes[1].SyllableSplit) - 2
-			if infixes[0] != nil {
-				stress += len(infixes[0].SyllableSplit) - 1
-			}
-		} else if infixes[0] != nil {
-			stress += len(infixes[0].SyllableSplit) - 2
-		}
 	}
 
 	for i, syllable := range curr {

@@ -87,7 +87,6 @@ func TestApplyInfixes(t *testing.T) {
 		infixes           string
 		start             int
 		stress            int
-		hasStressShift    bool
 		positions         [2][2]int
 		expectedSyllables string
 		expectedStress    int
@@ -190,101 +189,11 @@ func TestApplyInfixes(t *testing.T) {
 
 			expectedSyllables: "sey.kìl.ma.tsi", expectedStress: -1,
 		},
-
-		// Stress shift
-		{
-			curr: "i.nan", infixes: "er",
-			start: 0, stress: 1,
-			positions:      [2][2]int{{0, 0}, {1, 1}},
-			hasStressShift: true,
-
-			expectedSyllables: "e.ri.nan", expectedStress: 1,
-		},
-		{
-			curr: "i.nan", infixes: "ìyev",
-			start: 0, stress: 1,
-			positions:      [2][2]int{{0, 0}, {1, 1}},
-			hasStressShift: true,
-
-			expectedSyllables: "ì.ye.vi.nan", expectedStress: 2,
-		},
-		{
-			curr: "o.mum", infixes: "eyk,ol",
-			start: 0, stress: 1,
-			positions:      [2][2]int{{0, 0}, {1, 1}},
-			hasStressShift: true,
-
-			expectedSyllables: "ey.ko.lo.mum", expectedStress: 2,
-		},
-		{
-			curr: "o.mum", infixes: "äpeyk",
-			start: 0, stress: 1,
-			positions:      [2][2]int{{0, 0}, {1, 1}},
-			hasStressShift: true,
-
-			expectedSyllables: "ä.pey.ko.mum", expectedStress: 2,
-		},
-		{
-			curr: "eyk", infixes: "äp",
-			start: 0, stress: 0,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: false,
-
-			expectedSyllables: "ä.peyk", expectedStress: 1,
-		},
-		{
-			curr: "eyk", infixes: "äpeyk",
-			start: 0, stress: 0,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: false,
-
-			expectedSyllables: "ä.pey.keyk", expectedStress: 2,
-		},
-		{
-			curr: "eyk", infixes: "äpeyk,iyev,ei",
-			start: 0, stress: 0,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: false,
-
-			expectedSyllables: "ä.pey.ki.ye.ve.i.eyk", expectedStress: 6,
-		},
-		{
-			curr: "eyk", infixes: "äp,er,äng",
-			start: 0, stress: 0,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: false,
-
-			expectedSyllables: "ä.pe.rä.ngeyk", expectedStress: 3,
-		},
-		{
-			curr: "eyk", infixes: "äp,er,äng",
-			start: 0, stress: 0,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: false,
-
-			expectedSyllables: "ä.pe.rä.ngeyk", expectedStress: 3,
-		},
-		{
-			curr: "i.nan", infixes: "äp,er,äng",
-			start: 0, stress: 1,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: true,
-
-			expectedSyllables: "ä.pe.rä.ngi.nan", expectedStress: 3,
-		},
-		{
-			curr: "i.nan", infixes: "äp,er,äng",
-			start: 0, stress: 1,
-			positions:      [2][2]int{{0, 0}, {0, 0}},
-			hasStressShift: false,
-
-			expectedSyllables: "ä.pe.rä.ngi.nan", expectedStress: 4,
-		},
 	}
 
 	for _, row := range table {
 		t.Run(fmt.Sprintf("%s<%s>", row.curr, row.infixes), func(t *testing.T) {
-			resSyllables, resStress := ApplyInfixes(strings.Split(row.curr, "."), strings.Split(row.infixes, ","), row.start, row.stress, row.positions, row.hasStressShift)
+			resSyllables, resStress := ApplyInfixes(strings.Split(row.curr, "."), strings.Split(row.infixes, ","), row.stress, row.positions)
 			assert.Equal(t, strings.Split(row.expectedSyllables, "."), resSyllables)
 			assert.Equal(t, row.expectedStress, resStress)
 		})
