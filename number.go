@@ -14,11 +14,7 @@ func (n *NumberDictionary) LookupEntries(word string) ([]Entry, error) {
 		return nil, ErrEntryNotFound
 	}
 
-	syllables, stress, ok := res.GenerateSyllables(false)
-	if !ok {
-		return nil, ErrEntryNotFound
-	}
-
+	syllables, stress, _ := res.GenerateSyllables(false)
 	numberKind := "Number"
 	if res.Ordinal {
 		numberKind = "Ordinal number"

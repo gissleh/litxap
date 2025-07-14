@@ -1,7 +1,6 @@
 package litxaputil
 
 import (
-	"strconv"
 	"strings"
 )
 
@@ -17,7 +16,7 @@ func GenerateNumber(number int, ordinal bool) (syllables []string, stress int, o
 		} else {
 			syllables = append(syllables, numberRoots[number]...)
 		}
-
+		stress = 0 // mune, pukap and kinä have all stress on the first syllable
 		ok = true
 		return
 	}
@@ -28,47 +27,46 @@ func GenerateNumber(number int, ordinal bool) (syllables []string, stress int, o
 			digit := number / powerValue
 			number %= powerValue
 
-			if len(syllables) > 0 {
-				syllables = syllables[:len(syllables)-1]
-			}
 			if numberPrefixes[digit] != "" {
 				syllables = append(syllables, numberPrefixes[digit])
+			}
+
+			if number >= 1 && number < 0o10 {
+				suffixes := numberSuffixes
+				if ordinal {
+					suffixes = numberSuffixesOrdinal
+				}
+
+				syllables = append(syllables, numberPowers[i]...)
+				if number == 1 {
+					syllables[len(syllables)-1] += "aw"
+					if ordinal {
+						syllables = append(syllables, "ve")
+					}
+				} else {
+					syllables = append(syllables[:len(syllables)-1], suffixes[number]...)
+				}
+
 				stress = len(syllables) - 1
-			} else {
-				stress = len(syllables)
-			}
-			syllables = append(syllables, numberPowers[i]...)
-		}
-	}
+				if ordinal {
+					stress -= 1
+				}
 
-	if number > 0 {
-		suffixes := numberSuffixes
-		if ordinal {
-			suffixes = numberSuffixesOrdinal
-		}
-
-		stress = len(syllables) - 1
-		if number == 1 {
-			syllables = append(syllables[:len(syllables)-1], syllables[len(syllables)-1]+suffixes[number][0])
-			syllables = append(syllables, suffixes[number][1:]...)
-		} else {
-			syllables = append(syllables[:len(syllables)-1], suffixes[number]...)
-		}
-	} else {
-		if len(syllables[len(syllables)-1]) == 1 {
-			syllables = append(syllables[:len(syllables)-2], syllables[len(syllables)-2]+syllables[len(syllables)-1])
-		}
-		if ordinal {
-			if syllables[len(syllables)-1] == "zam" {
-				syllables = append(syllables[:len(syllables)-1], "za", "ve")
+				break
 			} else {
-				syllables = append(syllables, "ve")
+				syllables = append(syllables, numberPowersClosed[i]...)
+
+				if number == 0 && ordinal {
+					lastSyllable := syllables[len(syllables)-1]
+					if strings.HasSuffix(lastSyllable, "zam") {
+						syllables[len(syllables)-1] = strings.TrimSuffix(lastSyllable, "m")
+					}
+
+					syllables = append(syllables, "ve")
+					break
+				}
 			}
 		}
-	}
-
-	if number%8 == 0 {
-		stress = 0
 	}
 
 	ok = true
@@ -76,138 +74,151 @@ func GenerateNumber(number int, ordinal bool) (syllables []string, stress int, o
 }
 
 func ParseNumber(s string) *ParseNumberResult {
-	res := ParseNumberResult{}
-	if strings.HasPrefix(s, "a") && !strings.HasPrefix(s, "aw") {
-		res.Prefix = "a"
+	lastPower := 100000
+	number := 0
+	ordinal := false
+
+	prefix := ""
+	if strings.HasPrefix(s, "a") {
+		prefix = "a"
 		s = s[len("a"):]
-	} else if strings.HasSuffix(s, "a") {
-		res.Suffix = "a"
+	}
+	suffix := ""
+	if strings.HasSuffix(s, "a") {
+		suffix = "a"
 		s = s[:len(s)-len("a")]
 	}
-
-	// Parse a32, 32, 32ve, etc...
-	if n, err := strconv.Atoi(strings.TrimSuffix(s, "ve")); err == nil {
-		s2 := strconv.Itoa(n)
-		without := strings.TrimPrefix(s, s2)
-		if without == "ve" {
-			res.Ordinal = true
-			res.Value = n
-			return &res
-		} else {
-			res.Value = n
-			return &res
-		}
+	if prefix != "" && suffix != "" {
+		return nil
 	}
 
-	// Parse a°40, °40ve, etc...
-	if st := strings.TrimPrefix(strings.TrimPrefix(s, "0o"), "°"); st != s {
-		n, err := strconv.ParseInt(strings.TrimSuffix(st, "ve"), 8, 32)
-		if err != nil {
+	for len(s) > 0 {
+		part, next := ParseNumberPart(s)
+		if part == nil {
+			return nil
+		}
+		s = next
+
+		// Do not allow lenition
+		if part.Lenited && (number > 0 || prefix == "a") {
 			return nil
 		}
 
-		s2 := strconv.FormatInt(n, 8)
-		without := strings.TrimPrefix(st, s2)
-		if without == "ve" {
-			res.Ordinal = true
-			res.Value = int(n)
-			return &res
-		} else {
-			res.Value = int(n)
-			return &res
+		// Ensure we only get descending powers
+		if part.Power >= lastPower {
+			return nil
+		}
+		lastPower = part.Power
+		number += part.Value()
+		ordinal = part.Ordinal
+
+		if part.Terminal() && len(s) > 0 {
+			return nil
 		}
 	}
 
-	for n, root := range numberRootsCombined {
-		if s == root {
-			res.Value = n
-			return &res
-		}
+	return &ParseNumberResult{
+		Value:   number,
+		Ordinal: ordinal,
+		Prefix:  prefix,
+		Suffix:  suffix,
 	}
-	for n, root := range numberRootsCombinedOrdinal {
-		if s == root {
-			res.Value = n
-			res.Ordinal = true
-			return &res
-		}
-	}
-	if res.Prefix != "a" {
-		for n, root := range numberRootsCombinedLenition {
-			if s == root {
-				res.Value = n
-				return &res
-			}
-		}
-		for n, root := range numberRootsCombinedOrdinalLenition {
-			if s == root {
-				res.Value = n
-				res.Ordinal = true
-				return &res
-			}
-		}
-	}
+}
 
-	prevPower := numberPowerValues[len(numberPowerValues)-1] * 10 // Ensure it starts on an unattainable power.
+type NumberPart struct {
+	Multiplier int
+	Power      int
+	Remainder  int
+	Ordinal    bool
+	Lenited    bool
+}
 
-	for {
-		if res.Value > 0 {
-			numberSuffixes := numberSuffixesZam
-			ordinalSuffixes := numberSuffixesZamOrdinal
-			if prevPower == 0o10 {
-				numberSuffixes = numberSuffixesVol
-				ordinalSuffixes = numberSuffixesVolOrdinal
-			}
+func (np *NumberPart) Value() int {
+	return (np.Multiplier * np.Power) + np.Remainder
+}
 
-			for n, suff := range numberSuffixes {
-				if s == suff {
-					res.Value += n
-					return &res
-				}
-			}
-			for n, suff := range ordinalSuffixes {
-				if s == suff {
-					res.Ordinal = true
-					res.Value += n
-					return &res
-				}
-			}
-		}
+func (np *NumberPart) Terminal() bool {
+	return np.Ordinal || np.Remainder > 0 || np.Power == 1
+}
 
-		multiplier := 1
-		for n, pref := range numberPrefixes {
-			if pref != "" && strings.HasPrefix(s, pref) {
-				multiplier = n
-				s = s[len(pref):]
-				break
-			}
-		}
-
-		power := 0
-		for i := len(numberPowersCombined) - 1; i >= 0; i-- {
-			powerName := numberPowersCombined[i]
-			if len(powerName) == 0 {
+func ParseNumberPart(s string) (*NumberPart, string) {
+	for i, roots := range [][]string{numberPowersCombinedClosed[:], numberPowersCombinedClosedOrdinal[:]} {
+		for j, root := range roots {
+			if j == 0 {
 				continue
 			}
 
-			if strings.HasPrefix(s, powerName) {
-				n := numberPowerValues[i]
-				if n >= prevPower {
-					return nil
-				}
-
-				power = n
-				prevPower = n
-				s = s[len(powerName):]
-				break
+			if root != "" && root == s {
+				return &NumberPart{
+					Multiplier: 1,
+					Power:      numberPowerValues[j],
+					Ordinal:    i == 1,
+					Lenited:    false,
+				}, ""
 			}
 		}
-		if power > 0 {
-			res.Value += multiplier * power
-			continue
-		}
-
-		return nil // If something is found, it's continued
 	}
+
+	for i, roots := range [][]string{numberRootsCombined[:], numberRootsCombinedLenition[:], numberRootsCombinedOrdinal[:], numberRootsCombinedOrdinalLenition[:]} {
+		for j, root := range roots {
+			if root != "" && root == s {
+				return &NumberPart{
+					Multiplier: j,
+					Power:      1,
+					Ordinal:    i >= 2,
+					Lenited:    i%2 == 1,
+				}, ""
+			}
+		}
+	}
+
+	for prefixesIndex, prefixes := range [2][8]string{numberPrefixes, numberPrefixesLenited} {
+		for i, pre := range prefixes {
+			if pre == "" && (i != 1 || prefixesIndex != 0) {
+				continue
+			}
+
+			if strings.HasPrefix(s, pre) {
+				s := s[len(pre):]
+
+				for j, power := range numberPowersCombined {
+					if j == 0 {
+						continue
+					}
+
+					if strings.HasPrefix(s, power) {
+						s := s[len(power):]
+
+						suffixes := numberSuffixesZam
+						ordinalSuffixes := numberSuffixesZamOrdinal
+						if j == 1 {
+							suffixes = numberSuffixesVol
+							ordinalSuffixes = numberSuffixesVolOrdinal
+						}
+
+						for suffixesIndex, suffixes := range [][8]string{ordinalSuffixes, suffixes} {
+							for k := len(suffixes) - 1; k >= 0; k-- {
+								suf := suffixes[k]
+								if strings.HasPrefix(s, suf) {
+									s := s[len(suf):]
+
+									return &NumberPart{
+										Multiplier: i,
+										Power:      numberPowerValues[j],
+										Remainder:  k,
+										Ordinal:    suffixesIndex == 0,
+										Lenited:    prefixesIndex == 1,
+									}, s
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil, s
 }
 
 type ParseNumberResult struct {
@@ -238,12 +249,15 @@ func (r *ParseNumberResult) GenerateSyllables(affixed bool) (syllables []string,
 
 var numberPowerValues = [5]int{0o1, 0o10, 0o100, 0o1000, 0o10000}
 var numberPowers = [5][]string{{}, {"vo", "l"}, {"za", "m"}, {"vo", "za", "m"}, {"za", "za", "m"}}
+var numberPowersClosed = [5][]string{{}, {"vol"}, {"zam"}, {"vo", "zam"}, {"za", "zam"}}
 var numberRoots = [8][]string{{}, {"'aw"}, {"mu", "ne"}, {"pxey"}, {"tsìng"}, {"mrr"}, {"pu", "kap"}, {"ki", "nä"}}
 var numberRootsOrdinal = [8][]string{{}, {"'aw", "ve"}, {"mu", "ve"}, {"pxey", "ve"}, {"tsì", "ve"}, {"mrr", "ve"}, {"pu", "ve"}, {"ki", "ve"}}
 var numberPrefixes = [8]string{"", "", "me", "pxe", "tsì", "mrr", "pu", "ki"}
+var numberPrefixesLenited = [8]string{"", "", "", "pe", "sì", "", "fu", "hi"}
 var numberSuffixes = [8][]string{{}, {"aw"}, {"mun"}, {"pey"}, {"sìng"}, {"mrr"}, {"fu"}, {"hin"}}
 var numberSuffixesOrdinal = [8][]string{{"ve"}, {"aw", "ve"}, {"mu", "ve"}, {"pey", "ve"}, {"sì", "ve"}, {"mrr", "ve"}, {"fu", "ve"}, {"hi", "ve"}}
-
+var numberPowersCombinedClosed = [5]string{"", "vol", "zam", "vozam", "zazam"}
+var numberPowersCombinedClosedOrdinal = [5]string{"", "volve", "zave", "vozave", "zazave"}
 var numberPowersCombined = [5]string{"", "vo", "za", "voza", "zaza"}
 var numberSuffixesVol = [8]string{"l", "law", "mun", "pey", "sìng", "mrr", "fu", "hin"}
 var numberSuffixesVolOrdinal = [8]string{"lve", "lawve", "muve", "peyve", "sìve", "mrrve", "fuve", "hive"}

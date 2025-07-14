@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestNaviNumber(t *testing.T) {
+func TestGenerateNumber(t *testing.T) {
 	table := []struct {
 		number       int
 		ordinal      bool
@@ -43,6 +43,14 @@ func TestNaviNumber(t *testing.T) {
 			resSyllables: "pxe.vol", resStress: 0,
 		},
 		{
+			number: 0o100, ordinal: false,
+			resSyllables: "zam", resStress: 0,
+		},
+		{
+			number: 0o100, ordinal: true,
+			resSyllables: "za.ve", resStress: 0,
+		},
+		{
 			number: 0o3000, ordinal: false,
 			resSyllables: "pxe.vo.zam", resStress: 0,
 		},
@@ -60,23 +68,23 @@ func TestNaviNumber(t *testing.T) {
 		},
 		{
 			number: 0o43270, ordinal: false,
-			resSyllables: "tsì.za.za.pxe.vo.za.me.za.ki.vol", resStress: 0,
+			resSyllables: "tsì.za.zam.pxe.vo.zam.me.zam.ki.vol", resStress: 0,
 		},
 		{
 			number: 0o43272, ordinal: false,
-			resSyllables: "tsì.za.za.pxe.vo.za.me.za.ki.vo.mun", resStress: 10,
+			resSyllables: "tsì.za.zam.pxe.vo.zam.me.zam.ki.vo.mun", resStress: 10,
 		},
 		{
 			number: 0o63217, ordinal: true,
-			resSyllables: "pu.za.za.pxe.vo.za.me.za.vo.hi.ve", resStress: 9,
+			resSyllables: "pu.za.zam.pxe.vo.zam.me.zam.vo.hi.ve", resStress: 9,
 		},
 		{
 			number: 0o5010, ordinal: false,
-			resSyllables: "mrr.vo.za.vol", resStress: 0,
+			resSyllables: "mrr.vo.zam.vol", resStress: 0,
 		},
 		{
 			number: 0o5020, ordinal: false,
-			resSyllables: "mrr.vo.za.me.vol", resStress: 0,
+			resSyllables: "mrr.vo.zam.me.vol", resStress: 0,
 		},
 	}
 
@@ -86,6 +94,47 @@ func TestNaviNumber(t *testing.T) {
 			assert.Equal(t, row.resSyllables != "", ok)
 			assert.Equal(t, row.resSyllables, strings.Join(syllables, "."))
 			assert.Equal(t, row.resStress, stress)
+		})
+	}
+}
+
+func TestParseNumberPart(t *testing.T) {
+	table := []struct {
+		Input string
+		Res   *NumberPart
+		Next  string
+	}{
+		{"", nil, ""},
+		{"mune", &NumberPart{Multiplier: 2, Power: 1}, ""},
+		{"pukap", &NumberPart{Multiplier: 6, Power: 1}, ""},
+		{"sìng", &NumberPart{Multiplier: 4, Power: 1, Lenited: true}, ""},
+		{"kive", &NumberPart{Multiplier: 7, Power: 1, Ordinal: true}, ""},
+		{"hive", &NumberPart{Multiplier: 7, Power: 1, Ordinal: true, Lenited: true}, ""},
+		{"vol", &NumberPart{Multiplier: 1, Power: 0o10}, ""},
+		{"volaw", &NumberPart{Multiplier: 1, Power: 0o10, Remainder: 1}, ""},
+		{"vomun", &NumberPart{Multiplier: 1, Power: 0o10, Remainder: 2}, ""},
+		{"zam", &NumberPart{Multiplier: 1, Power: 0o100}, ""},
+		{"vozam", &NumberPart{Multiplier: 1, Power: 0o1000}, ""},
+		{"zazam", &NumberPart{Multiplier: 1, Power: 0o10000}, ""},
+		{"volve", &NumberPart{Multiplier: 1, Power: 0o10, Ordinal: true}, ""},
+		{"zave", &NumberPart{Multiplier: 1, Power: 0o100, Ordinal: true}, ""},
+		{"mevol", &NumberPart{Multiplier: 2, Power: 0o10}, ""},
+		{"mevolaw", &NumberPart{Multiplier: 2, Power: 0o10, Remainder: 1}, ""},
+		{"kizam", &NumberPart{Multiplier: 7, Power: 0o100, Remainder: 0}, ""},
+		{"puzave", &NumberPart{Multiplier: 6, Power: 0o100, Remainder: 0, Ordinal: true}, ""},
+		{"hivozave", &NumberPart{Multiplier: 7, Power: 0o1000, Remainder: 0, Ordinal: true, Lenited: true}, ""},
+		{"hivozamawve", &NumberPart{Multiplier: 7, Power: 0o1000, Remainder: 1, Ordinal: true, Lenited: true}, ""},
+		{"kizazamkivozamkizamkivohin", &NumberPart{Multiplier: 7, Power: 0o10000, Remainder: 0}, "kivozamkizamkivohin"},
+		{"kivozamkizamkivohin", &NumberPart{Multiplier: 7, Power: 0o1000, Remainder: 0}, "kizamkivohin"},
+		{"kizamkivohin", &NumberPart{Multiplier: 7, Power: 0o100, Remainder: 0}, "kivohin"},
+		{"kivohin", &NumberPart{Multiplier: 7, Power: 0o10, Remainder: 7}, ""},
+	}
+
+	for _, row := range table {
+		t.Run(row.Input, func(t *testing.T) {
+			res, next := ParseNumberPart(row.Input)
+			assert.Equal(t, row.Res, res)
+			assert.Equal(t, row.Next, next)
 		})
 	}
 }
@@ -114,24 +163,14 @@ func TestParseNumber(t *testing.T) {
 		{"avopey", &ParseNumberResult{Value: 0o13, Prefix: "a"}},
 		{"avofuve", &ParseNumberResult{Value: 0o16, Prefix: "a", Ordinal: true}},
 		{"mezamaw", &ParseNumberResult{Value: 0o201}},
-		{"mezazakivozatsìzavomrr", &ParseNumberResult{Value: 0o27415}},
+		{"mezapey", &ParseNumberResult{Value: 0o203}},
+		{"mezampxevol", &ParseNumberResult{Value: 0o230}},
+		{"tsìzampxevol", &ParseNumberResult{Value: 0o430}},
+		{"mezazamkivozamtsìzamvomrr", &ParseNumberResult{Value: 0o27415}},
 		{"kivozamezazatsìzavomrr", nil},
-
-		{"1a", &ParseNumberResult{Value: 1, Suffix: "a"}},
-		{"a17", &ParseNumberResult{Value: 17, Prefix: "a"}},
-		{"312", &ParseNumberResult{Value: 312}},
-		{"312ve", &ParseNumberResult{Value: 312, Ordinal: true}},
-		{"a1942ve", &ParseNumberResult{Value: 1942, Ordinal: true, Prefix: "a"}},
-		{"a1942vea", nil},
-		{"a1942vvea", nil},
-
-		{"°5a", &ParseNumberResult{Value: 0o5, Suffix: "a"}},
-		{"a°13", &ParseNumberResult{Value: 0o13, Prefix: "a"}},
-		{"°312", &ParseNumberResult{Value: 0o312}},
-		{"°312ve", &ParseNumberResult{Value: 0o312, Ordinal: true}},
-		{"°1742vea", &ParseNumberResult{Value: 0o1742, Ordinal: true, Suffix: "a"}},
-		{"a°1742vea", nil},
-		{"a°1742vvea", nil},
+		{"pxevoltsìzam", nil},
+		{"pxevol kaltxì, oer syaw fko kelsara aylì'u", nil},
+		{"kizamawpxevohin", nil},
 
 		{"ahive", nil},
 		{"afukap", nil},
@@ -156,7 +195,7 @@ func TestParseNumber_Exhaustive(t *testing.T) {
 		{Value: 0, Ordinal: true, Suffix: "a"},
 	}
 
-	for n := 1; n < 0o77777; n++ {
+	for n := 1; n <= 0o77777; n++ {
 		for i, result := range results {
 			result.Value = n
 

@@ -19,14 +19,11 @@ func TestNumberDictionary_LookupEntries(t *testing.T) {
 		{"mevozave", "me.vo.za.ve: : Ordinal number °2000 (1024)"},
 		{"mrrvomrr", "mrr.vo.*mrr: : Number °55 (45)"},
 		{"mrrvozam", "mrr.vo.zam: : Number °5000 (2560)"},
-		{"mrrvozavol", "mrr.vo.za.vol: : Number °5010 (2568)"},
-		{"mrrvozamevol", "mrr.vo.za.me.vol: : Number °5020 (2576)"},
-		{"mezavolaw", "me.za.vo.*law: : Number °211 (137)"},
+		{"mrrvozamvol", "mrr.vo.zam.vol: : Number °5010 (2568)"},
+		{"mrrvozammevol", "mrr.vo.zam.me.vol: : Number °5020 (2576)"},
+		{"mezamvolaw", "me.zam.vo.*law: : Number °211 (137)"},
 		{"mrrvomrrr", ""},
 		{"amrra", ""},
-		{"a5", "mrr: a-: Number 5"},
-		{"999999999999a", ""},
-		{"0a", ""},
 	}
 
 	for _, row := range table {
