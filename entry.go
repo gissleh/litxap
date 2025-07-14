@@ -37,7 +37,7 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 	}
 
 	// It is not known if this affects aho.
-	if (entry.Word == "inan" || entry.Word == "omum") && (len(entry.Infixes) > 0 || len(entry.Prefixes) > 0 || len(entry.Suffixes) > 0) {
+	if (entry.Word == "inan" || entry.Word == "omum") && (len(entry.Infixes) > 0 || len(entry.Prefixes) > 0) {
 		stress -= 1
 	}
 
