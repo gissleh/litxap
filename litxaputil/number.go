@@ -92,6 +92,10 @@ func ParseNumber(s string) *ParseNumberResult {
 		return nil
 	}
 
+	if len(strings.TrimSpace(s)) == 0 {
+		return nil
+	}
+
 	for len(s) > 0 {
 		part, next := ParseNumberPart(s)
 		if part == nil {

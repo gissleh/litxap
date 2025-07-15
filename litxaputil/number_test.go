@@ -171,6 +171,9 @@ func TestParseNumber(t *testing.T) {
 		{"pxevoltsìzam", nil},
 		{"pxevol kaltxì, oer syaw fko kelsara aylì'u", nil},
 		{"kizamawpxevohin", nil},
+		{"", nil},
+		{"a", nil},
+		{"aa", nil},
 
 		{"ahive", nil},
 		{"afukap", nil},
