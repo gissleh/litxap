@@ -18,6 +18,22 @@ func TestRunWord(t *testing.T) {
 			Res: "Fme.tok", ResStress: 0,
 		},
 		{
+			Raw: "Ayoe", Entry: "o.e: ay-",
+			Res: "A.yo.e", ResStress: 1,
+		},
+		{
+			Raw: "Ayoe", Entry: "ay.*o.e",
+			Res: "Ay.o.e", ResStress: 1,
+		},
+		{
+			Raw: "Ayoeti", Entry: "o.e: ay- -ti",
+			Res: "Ay.oe.ti", ResStress: 1,
+		},
+		{
+			Raw: "Ayoeteri", Entry: "ay.*o.e: -teri",
+			Res: "Ay.oe.te.ri", ResStress: 1,
+		},
+		{
 			Raw: "Tìtusìranìri", Entry: "t·ì.*r·an: tì- <us> -ìri",
 			Res: "Tì.tu.sì.ra.nì.ri", ResStress: 3,
 		},

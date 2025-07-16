@@ -31,16 +31,28 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 	syllables := append(entry.Syllables[:0:0], entry.Syllables...)
 	stress := entry.Stress
 
+	// Special case: oe becomes a syllable pronounced "we" when there are suffixes
+	if len(entry.Suffixes) > 0 {
+		switch entry.Word {
+		case "oe":
+			syllables = []string{"oe"}
+		case "ayoe":
+			syllables = []string{"ay", "oe"}
+		}
+	}
+
+	// Special case: Inan/omum shifts stress left prefixed or infixed. It is not known if this affects aho.
+	if (entry.Word == "inan" || entry.Word == "omum") && (len(entry.Infixes) > 0 || len(entry.Prefixes) > 0) {
+		stress -= 1
+	}
+
+	// Apply prefixes
 	syllables, offset := litxaputil.ApplyPrefixes(syllables, entry.Prefixes)
 	if stress != -1 {
 		stress += offset
 	}
 
-	// It is not known if this affects aho.
-	if (entry.Word == "inan" || entry.Word == "omum") && (len(entry.Infixes) > 0 || len(entry.Prefixes) > 0) {
-		stress -= 1
-	}
-
+	// Apply infixes
 	if entry.InfixPos != nil && len(entry.Infixes) > 0 {
 		positions := *entry.InfixPos
 		positions[0][0] += offset
@@ -49,6 +61,7 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 		syllables, stress = litxaputil.ApplyInfixes(syllables, entry.Infixes, stress, positions)
 	}
 
+	// Apply suffixes
 	syllables = litxaputil.ApplySuffixes(syllables, entry.Suffixes)
 
 	return syllables, stress, offset

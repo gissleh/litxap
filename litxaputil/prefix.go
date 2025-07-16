@@ -25,23 +25,24 @@ func (p Prefix) Apply(curr []string) ([]string, int) {
 		_, curr[0] = ApplyLenition(curr[0])
 	}
 
-	curr = append(p.syllableSplit[:len(p.syllableSplit):len(p.syllableSplit)], curr...)
+	afterPrefix := len(p.syllableSplit)
+	curr = append(p.syllableSplit[:afterPrefix:afterPrefix], curr...)
 
 	if p.loseTail != "" {
 		lostTail := false
 		for _, core := range attachableCores {
-			if strings.HasPrefix(curr[len(p.syllableSplit)], core) {
+			if strings.HasPrefix(curr[afterPrefix], core) && curr[afterPrefix] != "oe" {
 				lostTail = true
-				curr[len(p.syllableSplit)] = p.loseTail + curr[len(p.syllableSplit)]
+				curr[afterPrefix] = p.loseTail + curr[afterPrefix]
 			}
 		}
 
 		if !lostTail {
-			curr[len(p.syllableSplit)-1] += p.loseTail
+			curr[afterPrefix-1] += p.loseTail
 		}
 	}
 
-	return curr, len(p.syllableSplit)
+	return curr, afterPrefix
 }
 
 func ApplyPrefixes(curr []string, prefixNames []string) ([]string, int) {

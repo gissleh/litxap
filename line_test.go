@@ -65,7 +65,7 @@ func TestRunLine(t *testing.T) {
 			input: "Oel ngati kameie.",
 			expected: Line{
 				LinePart{Raw: "Oel", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"O", "el"}, 0, dummyDictionary["oel"], false},
+					{[]string{"Oel"}, 0, dummyDictionary["oel"], false},
 				}},
 				LinePart{Raw: " "},
 				LinePart{Raw: "ngati", IsWord: true, Matches: []LinePartMatch{
@@ -99,7 +99,7 @@ func TestRunLine(t *testing.T) {
 				}},
 				LinePart{Raw: " "},
 				LinePart{Raw: "oeru", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"o", "e", "ru"}, 0, dummyDictionary["oeru"], false},
+					{[]string{"oe", "ru"}, 0, dummyDictionary["oeru"], false},
 				}},
 				LinePart{Raw: " "},
 				LinePart{Raw: "let'eylan", IsWord: true, Matches: []LinePartMatch{
