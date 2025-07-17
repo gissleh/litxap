@@ -40,8 +40,10 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 			syllables = []string{"ay", "oe"}
 		case "oeng":
 			syllables = []string{"oeng"}
+			stress = 0
 		case "ayoeng":
 			syllables = []string{"ay", "oeng"}
+			stress = 1
 		}
 	}
 
