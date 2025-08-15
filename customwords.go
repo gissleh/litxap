@@ -6,8 +6,8 @@ import (
 )
 
 // CustomWords generates a dictionary for custom words like names and so on. It has a hardcoded set of
-// adpositions, so that must be changed if we get a new one.
-func CustomWords(names []string) Dictionary {
+// adpositions, so that must be changed if we get a new one. This does not enforce suffix rules.
+func CustomWords(names []string, definition string) Dictionary {
 	table := make(map[string][]string)
 
 	for _, name := range names {
@@ -41,7 +41,11 @@ func CustomWords(names []string) Dictionary {
 		}
 	}
 
-	return &customWordDictionary{table: table, definition: "Custom Name"}
+	if definition == "" {
+		definition = "Custom Word/Name"
+	}
+
+	return &customWordDictionary{table: table, definition: definition}
 }
 
 type customWordDictionary struct {
