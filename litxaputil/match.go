@@ -1,6 +1,7 @@
 package litxaputil
 
 import (
+	"log"
 	"strings"
 )
 
@@ -181,21 +182,25 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 			return []string{curr[:len(lenitedSyllable)]}, curr[len(lenitedSyllable):], 1, 1
 		}
 	}
-
-	// Edge case: ä becoming e
-	if syllable := strings.ReplaceAll(syllables[0], "ä", "e"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
-		return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
-	}
-
+	
 	// Reef Na'vi: gdb (dict entries showing as kx,tx,px)
-	withEjectives, hasInitialEjective := swapInitialEjective(syllables[0])
+	withEjectives, hasInitialEjective := swapRNInitialEjective(syllables[0])
 	if hasInitialEjective && strings.HasPrefix(currLower, withEjectives) {
 		return []string{curr[:len(withEjectives)]}, curr[len(withEjectives):], 1, 1
 	}
+	withFinalEjectives, hasFinalEjective := swapRNFinalEjective(withEjectives, syllables[1:])
+	log.Println(withFinalEjectives, hasFinalEjective)
+	if hasFinalEjective && strings.HasPrefix(currLower, withFinalEjectives) {
+		return []string{curr[:len(withFinalEjectives)]}, curr[len(withFinalEjectives):], 1, 1
+	}
 
-	// Reef Na'vi: ù (dict entries showing as u)
-	for _, syllable := range [2]string{syllables[0], withEjectives} {
+	// Reef Na'vi: ù (dict entries showing as u) and ä->e
+	for _, syllable := range [3]string{syllables[0], withEjectives, withFinalEjectives} {
 		if syllable := strings.ReplaceAll(syllable, "u", "ù"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
+			return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
+		}
+
+		if syllable := strings.ReplaceAll(syllable, "ä", "e"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
 			return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
 		}
 	}
@@ -265,10 +270,35 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 	return nil, curr, 0, 0
 }
 
-func swapInitialEjective(s string) (string, bool) {
+func swapRNInitialEjective(s string) (string, bool) {
 	for i, ejective := range ejectives {
 		if strings.HasPrefix(s, ejective) {
 			return ejectiveAlts[i] + s[len(ejective):], true
+		}
+	}
+
+	return s, false
+}
+
+func swapRNFinalEjective(s string, next []string) (string, bool) {
+	if len(next) == 0 {
+		return s, false
+	}
+
+	found := false
+	for _, ejective := range ejectives {
+		if strings.HasPrefix(next[0], ejective) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return s, false
+	}
+
+	for i, ejective := range ejectives {
+		if strings.HasSuffix(s, ejective) {
+			return s[:len(s)-len(ejective)] + ejectiveAlts[i], true
 		}
 	}
 

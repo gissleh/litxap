@@ -2,9 +2,10 @@ package litxaputil
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMatchSyllables(t *testing.T) {
@@ -309,6 +310,30 @@ func TestMatchSyllables(t *testing.T) {
 			root: 0, stress: 0,
 			newSyllables: "pey",
 			newStress:    0,
+		},
+		{
+			word: "weobe", syllables: "we.o.pxä",
+			root: 0, stress: 1,
+			newSyllables: "we.o.be",
+			newStress:    1,
+		},
+		{
+			word: "säbor", syllables: "sä.pxor",
+			root: 0, stress: 1,
+			newSyllables: "sä.bor",
+			newStress:    1,
+		},
+		{
+			word: "Bazang", syllables: "pxa.zang",
+			root: 0, stress: 0,
+			newSyllables: "Ba.zang",
+			newStress:    0,
+		},
+		{
+			word: "Egdua", syllables: "ekx.txu.a",
+			root: 0, stress: 1,
+			newSyllables: "Eg.du.a",
+			newStress:    1,
 		},
 	}
 

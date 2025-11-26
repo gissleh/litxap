@@ -1,9 +1,10 @@
 package litxap
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRunWord(t *testing.T) {
@@ -164,6 +165,26 @@ func TestRunWord(t *testing.T) {
 		{
 			Raw: "oengteri", Entry: "o.*eng: -teri",
 			Res: "oeng.te.ri", ResStress: 0,
+		},
+		{
+			Raw: "Weobe", Entry: "we.*opx: -ä",
+			Res: "We.o.be", ResStress: 1,
+		},
+		{
+			Raw: "BAZANGTSYÌP", Entry: "*pxa.zang: -tsyìp",
+			Res: "BA.ZANG.TSYÌP", ResStress: 0,
+		},
+		{
+			Raw: "'awgìl", Entry: "'awkx: -ìl",
+			Res: "'aw.gìl", ResStress: 0,
+		},
+		{
+			Raw: "sebor", Entry: "sä.*pxor",
+			Res: "se.bor", ResStress: 1,
+		},
+		{
+			Raw: "adgeye", Entry: "atx.*kxe: -yä",
+			Res: "ad.ge.ye", ResStress: 1,
 		},
 	}
 
