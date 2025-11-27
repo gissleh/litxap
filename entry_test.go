@@ -3,9 +3,10 @@ package litxap
 import (
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type DummyDictionary map[string]Entry
@@ -97,4 +98,41 @@ func TestMultiDictionary_LookupEntries(t *testing.T) {
 	res, err = mdGood.LookupEntries("sa'nokur")
 	assert.NoError(t, err)
 	assert.Equal(t, res, []Entry{*ParseEntry("sa'.nok: -ur: nother")})
+}
+
+func TestEntry_GenerateSyllables(t *testing.T) {
+	table := []struct {
+		Entry     string
+		Syllables string
+		Stress    int
+		Offset    int
+	}{
+		{"fme.tok", "fme.tok", 0, 0},
+		{"fm·e.t·ok: <ìm>", "fmì.me.tok", 1, 0},
+		{"em.*k··ä: pe-pxe-tì- <us> -tsyìp-ìl", "pe.pe.sì.em.ku.sä.tsyì.pìl", 5, 3},
+		{"*o.e: -ti", "oe.ti", 0, 0},
+		{"*o.e: -ti", "oe.ti", 0, 0},
+		{"o.*eng: -ti", "oeng.ti", 0, 0},
+		{"ay.*oe: -r", "ay.oer", 1, 0},
+		{"*o.e: ay-", "a.yo.e", 1, 1},
+		{"ay.*oeng: -ìl", "ay.oe.ngìl", 1, 0},
+		{"·o.*m·um: tsuk-", "tsu.ko.mum", 1, 1},
+		{"·i.*n·an: -tswo", "i.nan.tswo", 1, 0},
+		{"·i.*n·an: <äp,eyk,us>", "ä.pey.ku.si.nan", 3, 0},
+	}
+
+	for _, row := range table {
+		t.Run(row.Entry, func(t *testing.T) {
+			entry := ParseEntry(row.Entry)
+			if !assert.NotNil(t, entry) {
+				return
+			}
+
+			syllables, stress, offset := entry.GenerateSyllables()
+
+			assert.Equal(t, row.Syllables, strings.Join(syllables, "."))
+			assert.Equal(t, row.Stress, stress)
+			assert.Equal(t, row.Offset, offset)
+		})
+	}
 }

@@ -2,9 +2,10 @@ package litxaputil
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInfixPositionsFromBrackets(t *testing.T) {

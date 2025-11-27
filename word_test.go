@@ -179,12 +179,28 @@ func TestRunWord(t *testing.T) {
 			Res: "'aw.gìl", ResStress: 0,
 		},
 		{
+			Raw: "tìkusurage", Entry: "k·u.*r·akx: tì- <us> -ä",
+			Res: "tì.ku.su.ra.ge", ResStress: 3,
+		},
+		{
+			Raw: "TÌTUSEL", Entry: "t··el: tì- <us>",
+			Res: "TÌ.TU.SEL", ResStress: 2,
+		},
+		{
 			Raw: "sebor", Entry: "sä.*pxor",
 			Res: "se.bor", ResStress: 1,
 		},
 		{
 			Raw: "adgeye", Entry: "atx.*kxe: -yä",
 			Res: "ad.ge.ye", ResStress: 1,
+		},
+		{
+			Raw: "shulangchìp", Entry: "syu.lang: -tsyìp",
+			Res: "shu.lang.chìp", ResStress: 0,
+		},
+		{
+			Raw: "nìChùngwen", Entry: "nì.*tsyung.wen",
+			Res: "nì.Chùng.wen", ResStress: 1,
 		},
 	}
 

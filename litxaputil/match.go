@@ -1,7 +1,6 @@
 package litxaputil
 
 import (
-	"log"
 	"strings"
 )
 
@@ -182,20 +181,23 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 			return []string{curr[:len(lenitedSyllable)]}, curr[len(lenitedSyllable):], 1, 1
 		}
 	}
-	
+
 	// Reef Na'vi: gdb (dict entries showing as kx,tx,px)
 	withEjectives, hasInitialEjective := swapRNInitialEjective(syllables[0])
 	if hasInitialEjective && strings.HasPrefix(currLower, withEjectives) {
 		return []string{curr[:len(withEjectives)]}, curr[len(withEjectives):], 1, 1
 	}
 	withFinalEjectives, hasFinalEjective := swapRNFinalEjective(withEjectives, syllables[1:])
-	log.Println(withFinalEjectives, hasFinalEjective)
 	if hasFinalEjective && strings.HasPrefix(currLower, withFinalEjectives) {
 		return []string{curr[:len(withFinalEjectives)]}, curr[len(withFinalEjectives):], 1, 1
 	}
+	withShCh, hasShCh := swapRNInitialSyTsy(syllables[0])
+	if hasShCh && strings.HasPrefix(currLower, withShCh) {
+		return []string{curr[:len(withShCh)]}, curr[len(withShCh):], 1, 1
+	}
 
 	// Reef Na'vi: ù (dict entries showing as u) and ä->e
-	for _, syllable := range [3]string{syllables[0], withEjectives, withFinalEjectives} {
+	for _, syllable := range [4]string{syllables[0], withEjectives, withFinalEjectives, withShCh} {
 		if syllable := strings.ReplaceAll(syllable, "u", "ù"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
 			return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
 		}
@@ -280,6 +282,16 @@ func swapRNInitialEjective(s string) (string, bool) {
 	return s, false
 }
 
+func swapRNInitialSyTsy(s string) (string, bool) {
+	for i, reefSyTsy := range reefSyTsys {
+		if strings.HasPrefix(s, reefSyTsy) {
+			return reefSyTsysAlts[i] + s[len(reefSyTsy):], true
+		}
+	}
+
+	return s, false
+}
+
 func swapRNFinalEjective(s string, next []string) (string, bool) {
 	if len(next) == 0 {
 		return s, false
@@ -307,6 +319,9 @@ func swapRNFinalEjective(s string, next []string) (string, bool) {
 
 var ejectives = []string{"px", "tx", "kx"}
 var ejectiveAlts = []string{"b", "d", "g"}
+
+var reefSyTsys = []string{"sy", "tsy"}
+var reefSyTsysAlts = []string{"sh", "ch"}
 
 var fusableTails = []string{"px", "tx", "kx", "m", "n", "l", "r", "p", "t", "k"}
 var fusableMids = []string{"a", "ä", "e", "i", "ì", "o", "u", "ù"}
