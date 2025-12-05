@@ -336,6 +336,12 @@ func TestMatchSyllables(t *testing.T) {
 			newStress:    1,
 		},
 		{
+			word: "fneDùm", syllables: "fne.txum",
+			root: 0, stress: 1,
+			newSyllables: "fne.Dùm",
+			newStress:    1,
+		},
+		{
 			word: "Shulangchìp", syllables: "syu.lang.tsyìp",
 			root: 0, stress: 0,
 			newSyllables: "Shu.lang.chìp",

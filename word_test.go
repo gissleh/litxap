@@ -191,6 +191,10 @@ func TestRunWord(t *testing.T) {
 			Res: "se.bor", ResStress: 1,
 		},
 		{
+			Raw: "gùmpaysyarit", Entry: "*kxum.pay.syar: -it",
+			Res: "gùm.pay.sya.rit", ResStress: 0,
+		},
+		{
 			Raw: "adgeye", Entry: "atx.*kxe: -yä",
 			Res: "ad.ge.ye", ResStress: 1,
 		},
