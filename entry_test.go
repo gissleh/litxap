@@ -47,6 +47,7 @@ func TestParseEntry(t *testing.T) {
 		"t··el: <ei>: get, receive",
 		"t·a.r·on: tì- <us> -ti: hunt",
 		"t·ì.*r·an: tì- <us> -ìri: walk",
+		"te.li.*si: -t: whirlwind",
 		"sä.*pxor: : explosion",
 		"tsa.heyl: no_stress: (part of tsaheyl si)",
 	}
@@ -119,6 +120,7 @@ func TestEntry_GenerateSyllables(t *testing.T) {
 		{"·o.*m·um: tsuk-", "tsu.ko.mum", 1, 1},
 		{"·i.*n·an: -tswo", "i.nan.tswo", 1, 0},
 		{"·i.*n·an: <äp,eyk,us>", "ä.pey.ku.si.nan", 3, 0},
+		{"te.li.*si: -t", "te.li.sit", 2, 0},
 	}
 
 	for _, row := range table {

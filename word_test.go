@@ -75,15 +75,15 @@ func TestRunWord(t *testing.T) {
 			Res: "Tsa.heyl", ResStress: -1,
 		},
 		{
-			Raw: "taronyu", Entry: "ta.ron: -yu",
+			Raw: "taronyu", Entry: "t·a.r·on: -yu",
 			Res: "ta.ron.yu", ResStress: 0,
 		},
 		{
-			Raw: "uvantswo", Entry: "u.*van.si: -tswo: gamer cred",
+			Raw: "uvantswo", Entry: "u.*van.s··i: -tswo: gamer cred",
 			Res: "u.van.tswo", ResStress: 1,
 		},
 		{
-			Raw: "narisiyu", Entry: "*na.ri.si: -yu",
+			Raw: "narisiyu", Entry: "*na.ri.s··i: -yu",
 			Res: "na.ri.si.yu", ResStress: 0,
 		},
 		{
@@ -95,11 +95,11 @@ func TestRunWord(t *testing.T) {
 			Res: "srung.-su.si.a", ResStress: 0,
 		},
 		{
-			Raw: "kemtsyìposiyu", Entry: "*kem.si: -tsyìp-o-yu",
+			Raw: "kemtsyìposiyu", Entry: "*kem.s··i: -tsyìp-o-yu",
 			Res: "kem.tsyì.po.si.yu", ResStress: 0,
 		},
 		{
-			Raw: "kemtsyìposiyuo", Entry: "*kem.si: -tsyìp-o-yu-o",
+			Raw: "kemtsyìposiyuo", Entry: "*kem.s··i: -tsyìp-o-yu-o",
 			Res: "kem.tsyì.po.si.yu.o", ResStress: 0,
 		},
 		{
@@ -205,6 +205,10 @@ func TestRunWord(t *testing.T) {
 		{
 			Raw: "nìChùngwen", Entry: "nì.*tsyung.wen",
 			Res: "nì.Chùng.wen", ResStress: 1,
+		},
+		{
+			Raw: "telisit", Entry: "te.li.*si: -t",
+			Res: "te.li.sit", ResStress: 2,
 		},
 	}
 

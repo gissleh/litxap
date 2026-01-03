@@ -7,7 +7,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	res := CustomWords([]string{"nor", "no", "ta-*mu", "-ke.a.fkxa.ra", "kel.nì"}, "")
+	res := CustomWords([]string{"nor", "no", "ta-*mu", "-ke.a.fkxa.ra", "kel.nì", "te.li.si"}, "")
 	assert.Equal(t, []string{"nor: ", "no: -r "}, res.(*customWordDictionary).table["nor"])
 	assert.Equal(t, []string{"ta.*mu: -ri "}, res.(*customWordDictionary).table["tamuri"])
 
@@ -34,6 +34,11 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []Entry{
 		*ParseEntry("ke.a.fkxa.ra: -teri no_stress: Custom Word/Name"),
+	}, entries)
+
+	entries, err = res.LookupEntries("telisit")
+	assert.Equal(t, []Entry{
+		*ParseEntry("te.li.si: -t: Custom Word/Name"),
 	}, entries)
 
 	entries, err = res.LookupEntries("neytiriti")

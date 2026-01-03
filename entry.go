@@ -2,6 +2,7 @@ package litxap
 
 import (
 	"errors"
+	"slices"
 	"strings"
 
 	"github.com/gissleh/litxap/litxaputil"
@@ -68,7 +69,8 @@ func (entry *Entry) GenerateSyllables() ([]string, int, int) {
 	}
 
 	// Apply suffixes
-	syllables = litxaputil.ApplySuffixes(syllables, entry.Suffixes)
+	isVerb := entry.InfixPos != nil && !slices.Contains(entry.Prefixes, "tì") && !slices.Contains(entry.Infixes, "us")
+	syllables = litxaputil.ApplySuffixes(syllables, entry.Suffixes, isVerb)
 
 	return syllables, stress, offset
 }
