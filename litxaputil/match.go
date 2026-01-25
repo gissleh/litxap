@@ -143,7 +143,12 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		lng := len("ng")
 
 		if strings.HasPrefix(currLower, syllables[0][:l0]+"a"+syllables[1]) {
-			return []string{curr[:l0-lng], "nga" + curr[l0+len("a"):l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
+			// nga.ti, not ngati
+			if endsWithVowel(syllables[1]) {
+				return []string{curr[:l0-lng], "nga", curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
+			}
+
+			return []string{curr[:l0-lng], "nga" + curr[l0+len("a"):l0+len("a")+l1]}, curr[l0+l1+1:], 2, 1
 		}
 	}
 
@@ -154,7 +159,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		lng := len("ng")
 
 		if strings.HasPrefix(currLower, syllables[0][:l0]+"e"+syllables[1]) {
-			return []string{curr[:l0-lng], "nge", curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 3
+			return []string{curr[:l0-lng], "nge", curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
 		}
 	}
 
@@ -324,4 +329,17 @@ var reefSyTsys = []string{"sy", "tsy"}
 var reefSyTsysAlts = []string{"sh", "ch"}
 
 var fusableTails = []string{"px", "tx", "kx", "m", "n", "l", "r", "p", "t", "k"}
-var fusableMids = []string{"a", "ä", "e", "i", "ì", "o", "u", "ù"}
+var fusableMids = nonPseudoVowels
+
+var nonPseudoVowels = []string{"a", "ä", "e", "i", "ì", "o", "u", "ù"}
+var allVowels = append(nonPseudoVowels, "rr", "ll")
+
+func endsWithVowel(s string) bool {
+	for _, vowel := range allVowels {
+		if strings.HasSuffix(s, vowel) {
+			return true
+		}
+	}
+
+	return false
+}

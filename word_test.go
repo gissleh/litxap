@@ -152,15 +152,19 @@ func TestRunWord(t *testing.T) {
 		},
 		{
 			Raw: "oengal", Entry: "o.*eng: -l",
-			Res: "oe.ngal", ResStress: 0,
+			Res: "oe.ngal", ResStress: 1,
+		},
+		{
+			Raw: "pxoengaru", Entry: "pxo.*eng: -ru",
+			Res: "pxo.e.nga.ru", ResStress: 2,
 		},
 		{
 			Raw: "meoeng", Entry: "o.*eng: me-",
 			Res: "me.o.eng", ResStress: 2,
 		},
 		{
-			Raw: "ayoengal", Entry: "ay.*o.eng: -l",
-			Res: "ay.oe.ngal", ResStress: 1,
+			Raw: "ayoengal", Entry: "ay.*oeng: -l",
+			Res: "ay.oe.ngal", ResStress: 2,
 		},
 		{
 			Raw: "oengteri", Entry: "o.*eng: -teri",

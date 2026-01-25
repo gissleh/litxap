@@ -121,6 +121,7 @@ func TestEntry_GenerateSyllables(t *testing.T) {
 		{"·i.*n·an: -tswo", "i.nan.tswo", 1, 0},
 		{"·i.*n·an: <äp,eyk,us>", "ä.pey.ku.si.nan", 3, 0},
 		{"te.li.*si: -t", "te.li.sit", 2, 0},
+		{"pxo.*eng: -ru", "pxo.eng.ru", 1, 0},
 	}
 
 	for _, row := range table {
