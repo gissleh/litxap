@@ -1,6 +1,7 @@
 package litxap
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -155,8 +156,8 @@ func TestRunWord(t *testing.T) {
 			Res: "oe.ngal", ResStress: 1,
 		},
 		{
-			Raw: "pxoengaru", Entry: "pxo.*eng: -ru",
-			Res: "pxo.e.nga.ru", ResStress: 2,
+			Raw: "pxoeNGAru", Entry: "pxo.*eng: -ru",
+			Res: "pxo.e.NGA.ru", ResStress: 2,
 		},
 		{
 			Raw: "meoeng", Entry: "o.*eng: me-",
@@ -217,7 +218,7 @@ func TestRunWord(t *testing.T) {
 	}
 
 	for _, row := range table {
-		t.Run(row.Entry, func(t *testing.T) {
+		t.Run(fmt.Sprintf("%s.%s", row.Raw, row.Entry), func(t *testing.T) {
 			res, resStress := RunWord(row.Raw, *ParseEntry(row.Entry))
 
 			syllables, stress, root := ParseEntry(row.Entry).GenerateSyllables()

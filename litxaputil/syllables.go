@@ -21,7 +21,7 @@ type Syllable struct {
 }
 
 // SplitSyllables uses predictable reanalysis rules to split a na'vi word into syllables. It will handle some
-// irregular words (including: tlalim, mangkwan, kreytu'um) but will log them.
+// irregular words (including: tlalim, mangkwan, kreytu'um) but will log their irregularities.
 func SplitSyllables(s string) Syllables {
 	res := make(Syllables, 0, len(s))
 	for len(s) > 0 {
@@ -98,6 +98,7 @@ func SplitSyllables(s string) Syllables {
 			}
 		}
 
+		// rr and ll must have an onset. Even lenition won't break this rule.
 		if (curr.Body == "rr" || curr.Body == "ll") && curr.Onset == "" {
 			return nil
 		}
@@ -105,7 +106,9 @@ func SplitSyllables(s string) Syllables {
 		res = append(res, curr)
 	}
 
+	// We've been working backwards, so flip it.
 	slices.Reverse(res)
+
 	return res
 }
 

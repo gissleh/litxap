@@ -141,14 +141,15 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		l0 := len(syllables[0])
 		l1 := len(syllables[1])
 		lng := len("ng")
-
 		if strings.HasPrefix(currLower, syllables[0][:l0]+"a"+syllables[1]) {
+			nga := curr[l0-lng : (l0-lng)+len("nga")]
+
 			// nga.ti, not ngati
 			if endsWithVowel(syllables[1]) {
-				return []string{curr[:l0-lng], "nga", curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
+				return []string{curr[:l0-lng], nga, curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
 			}
 
-			return []string{curr[:l0-lng], "nga" + curr[l0+len("a"):l0+len("a")+l1]}, curr[l0+l1+1:], 2, 1
+			return []string{curr[:l0-lng], nga + curr[l0+len("a"):l0+len("a")+l1]}, curr[l0+l1+1:], 2, 1
 		}
 	}
 
@@ -159,7 +160,8 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		lng := len("ng")
 
 		if strings.HasPrefix(currLower, syllables[0][:l0]+"e"+syllables[1]) {
-			return []string{curr[:l0-lng], "nge", curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
+			nge := curr[l0-lng : (l0-lng)+len("nge")]
+			return []string{curr[:l0-lng], nge, curr[l0+len("a") : l0+len("a")+l1]}, curr[l0+l1+1:], 2, 2
 		}
 	}
 

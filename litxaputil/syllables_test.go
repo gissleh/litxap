@@ -27,6 +27,7 @@ func TestParseSyllables(t *testing.T) {
 		{"vol", "vol", Syllable{Onset: "v", Body: "o", Coda: "l"}},
 		{"tswayon", "tswa-yon", Syllable{PreOnset: "ts", Onset: "w", Body: "a"}},
 		{"meoauniaea", "me-o-a-u-ni-a-e-a", Syllable{Onset: "m", Body: "e"}},
+		{"emreeeeeeeeey", "em-re-e-e-e-e-e-e-e-ey", Syllable{Body: "e", Coda: "m"}},
 		{"tlalim", "tla-lim (irregulars: tl)", Syllable{Onset: "t", Irregular: "l", Body: "a"}},
 		{"mangkwan", "mang-kwan (irregulars: kw)", Syllable{Onset: "m", Body: "a", Coda: "ng"}},
 		{"kreytu'um", "krey-tu-'um (irregulars: kr)", Syllable{Onset: "k", Irregular: "r", Body: "ey"}},
