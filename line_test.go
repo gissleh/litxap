@@ -39,45 +39,58 @@ var dummyDictionary = DummyDictionary{
 	"po soli:0":     *ParseEntry("si: <ol>"),
 }
 
+var lineOelNgatiKameie = Line{
+	LinePart{Raw: "Oel", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Oel"}, 0, dummyDictionary["oel"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "ngati", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"nga", "ti"}, 0, dummyDictionary["ngati"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "kameie", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"ka", "me", "i", "e"}, 0, dummyDictionary["kameie"], false},
+		{[]string{"ka", "me", "i", "e"}, 3, dummyDictionary["kameie:0"], false},
+	}},
+	LinePart{Raw: "."},
+}
+
+var lineKaltxiMaFmetokyu = Line{
+	LinePart{Raw: "Kaltxì", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Kal", "txì"}, 1, dummyDictionary["kaltxì"], false},
+	}},
+	LinePart{Raw: ", "},
+	LinePart{Raw: "ma", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"ma"}, 0, dummyDictionary["ma"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "fmetokyu", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"fme", "tok", "yu"}, 0, dummyDictionary["fmetokyu"], false},
+	}},
+	LinePart{Raw: "!"},
+}
+
+var lineVolaSkeynven = Line{
+	LinePart{Raw: "Vola", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Vo", "la"}, 0, dummyDictionary["vola"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "skeynven", IsWord: true},
+	LinePart{Raw: "."},
+}
+
 func TestRunLine(t *testing.T) {
 	table := []struct {
 		input    string
 		expected Line
 	}{
 		{
-			input: "Kaltxì, ma fmetokyu!",
-			expected: Line{
-				LinePart{Raw: "Kaltxì", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"Kal", "txì"}, 1, dummyDictionary["kaltxì"], false},
-				}},
-				LinePart{Raw: ", "},
-				LinePart{Raw: "ma", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"ma"}, 0, dummyDictionary["ma"], false},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "fmetokyu", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"fme", "tok", "yu"}, 0, dummyDictionary["fmetokyu"], false},
-				}},
-				LinePart{Raw: "!"},
-			},
+			input:    "Kaltxì, ma fmetokyu!",
+			expected: lineKaltxiMaFmetokyu,
 		},
 		{
-			input: "Oel ngati kameie.",
-			expected: Line{
-				LinePart{Raw: "Oel", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"Oel"}, 0, dummyDictionary["oel"], false},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "ngati", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"nga", "ti"}, 0, dummyDictionary["ngati"], false},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "kameie", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"ka", "me", "i", "e"}, 0, dummyDictionary["kameie"], false},
-					{[]string{"ka", "me", "i", "e"}, 3, dummyDictionary["kameie:0"], false},
-				}},
-				LinePart{Raw: "."},
-			},
+			input:    "Oel ngati kameie.",
+			expected: lineOelNgatiKameie,
 		},
 		{
 			input: "Ayhapxìtu soaiä ngeyä lu oeru let'eylan nìwotx.",
@@ -113,15 +126,8 @@ func TestRunLine(t *testing.T) {
 			},
 		},
 		{
-			input: "Vola skeynven.",
-			expected: Line{
-				LinePart{Raw: "Vola", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"Vo", "la"}, 0, dummyDictionary["vola"], false},
-				}},
-				LinePart{Raw: " "},
-				LinePart{Raw: "skeynven", IsWord: true},
-				LinePart{Raw: "."},
-			},
+			input:    "Vola skeynven.",
+			expected: lineVolaSkeynven,
 		},
 		{
 			input: "Vola säkeynven|skeynven.",
@@ -263,182 +269,60 @@ func TestParseLine(t *testing.T) {
 	}
 }
 
-func TestLine_UnStressSiVerbParts(t *testing.T) {
-	line := Line{
-		LinePart{Raw: "Po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"Po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"u", "van"}, 1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
-	}
+type dummyLineFormatter struct{}
 
-	assert.Equal(t, Line{
-		LinePart{Raw: "Po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"Po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"u", "van"}, 1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, -1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
-	}, line.UnStressSiVerbParts(dummyDictionary))
+func (f *dummyLineFormatter) LinePartTags(lp LinePart, stress int) (string, string) {
+	switch stress {
+	case LPSNotWord:
+		return "", ""
+	case LPSAmbiguousMatches:
+		return "[AM]", "[/AM]"
+	case LPSNoMatches:
+		return "[NM]", "[/NM]"
+	case LPSAnyStress:
+		return "[AS]", "[/AS]"
+	default:
+		return "[S]", "[/S]"
+	}
 }
 
-func TestLine_UnStressSiVerbParts_Negated(t *testing.T) {
-	line := Line{
-		LinePart{Raw: "Po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"Po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"u", "van"}, 1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ke", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ke"}, 0, dummyDictionary["ke"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
-	}
-
-	assert.Equal(t, Line{
-		LinePart{Raw: "Po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"Po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"u", "van"}, -1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ke", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ke"}, 0, dummyDictionary["ke"], true},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, -1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
-	}, line.UnStressSiVerbParts(dummyDictionary))
-
-	line[4] = LinePart{Raw: "rä'ä", IsWord: true, Matches: []LinePartMatch{
-		{[]string{"rä'ä"}, 1, dummyDictionary["rä'ä"], false},
-	}}
-
-	assert.Equal(t, Line{
-		LinePart{Raw: "Po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"Po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"u", "van"}, 1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "rä'ä", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"rä'ä"}, 1, dummyDictionary["rä'ä"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, -1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
-	}, line.UnStressSiVerbParts(dummyDictionary))
+func (f *dummyLineFormatter) StressedSyllableTags() (string, string) {
+	return "{", "}"
 }
 
-func TestLine_UnStressSiVerbParts_SubClause(t *testing.T) {
-	line := Line{
-		LinePart{Raw: "Uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"U", "van"}, 1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "a", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"a"}, 0, dummyDictionary["a"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
-	}
-
-	assert.Equal(t, line, line.UnStressSiVerbParts(dummyDictionary))
+var lineFikemIlaFyao = Line{
+	LinePart{Raw: "Fìkem", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Fì", "kem"}, 1, dummyDictionary["fìkem"], false},
+		{[]string{"Fì", "kem"}, 1, dummyDictionary["fìkem:0"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "ìlä", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"ì", "lä"}, 0, dummyDictionary["ìlä"], false},
+		{[]string{"ì", "lä"}, 1, dummyDictionary["ìlä:0"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "fya'o", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"fya", "'o"}, 0, dummyDictionary["fya'o"], false},
+	}},
+	LinePart{Raw: "!"},
 }
 
-func TestLine_UnStressSiVerbParts_SentenceBoundary(t *testing.T) {
-	line := Line{
-		LinePart{Raw: "Uvan", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"U", "van"}, 1, dummyDictionary["uvan"], false},
-		}},
-		LinePart{Raw: ", "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "po", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"po"}, 0, dummyDictionary["po"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "ikranhu", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"ik", "ran", "hu"}, 0, dummyDictionary["ikranhu"], false},
-		}},
-		LinePart{Raw: "."},
+func TestLine_Format(t *testing.T) {
+	table := []struct {
+		input      Line
+		output     string
+		selections map[int]int
+	}{
+		{lineOelNgatiKameie, "[S]Oel[/S] [S]{nga}ti[/S] [AM]kameie[/AM].", nil},
+		{lineOelNgatiKameie, "[S]Oel[/S] [S]{nga}ti[/S] [S]{ka}meie[/S].", map[int]int{4: 0}},
+		{lineKaltxiMaFmetokyu, "[S]Kal{txì}[/S], [S]ma[/S] [S]{fme}tokyu[/S]!", nil},
+		{lineVolaSkeynven, "[S]{Vo}la[/S] [NM]skeynven[/NM].", nil},
+		{lineFikemIlaFyao, "[S]Fì{kem}[/S] [AS]ìlä[/AS] [S]{fya}'o[/S]!", map[int]int{2: 2}},
 	}
 
-	assert.Equal(t, line, line.UnStressSiVerbParts(dummyDictionary))
-}
-
-func TestLine_UnStressSiVerbParts_NoWordBeforeKe(t *testing.T) {
-	line := Line{
-		LinePart{Raw: "Ke", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"Ke"}, 1, dummyDictionary["ke"], false},
-		}},
-		LinePart{Raw: " "},
-		LinePart{Raw: "soli", IsWord: true, Matches: []LinePartMatch{
-			{[]string{"so", "li"}, 1, dummyDictionary["soli"], false},
-		}},
-		LinePart{Raw: "."},
+	for _, row := range table {
+		t.Run(row.output, func(t *testing.T) {
+			assert.Equal(t, row.output, row.input.Format(&dummyLineFormatter{}, row.selections))
+		})
 	}
-
-	assert.Equal(t, line, line.UnStressSiVerbParts(dummyDictionary))
 }

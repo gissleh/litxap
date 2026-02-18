@@ -54,80 +54,41 @@ func (line Line) Run(dict Dictionary) (Line, error) {
 	return newLine, nil
 }
 
-func (line Line) UnStressSiVerbParts(dict Dictionary) Line {
-	isCopied := false
-	newLine := line
+func (line Line) Format(f LineFormatter, selections map[int]int) string {
+	stressOpen, stressClose := f.StressedSyllableTags()
+	sb := &strings.Builder{}
 
 	for i, part := range line {
-		if part.matchesWord("si") {
-			if p := line.prevWord(i); p != -1 {
-				p2 := p
-				isKe := line[p].matchesWord("ke")
-				isRaa := line[p].matchesWord("rä'ä")
-				if isKe || isRaa {
-					p2 = line.prevWord(p)
-					if p2 == -1 {
-						continue
+		selected, ok := selections[i]
+		if !ok {
+			selected = -1
+		}
+
+		syllables, stress := part.GetSyllables(selected)
+		partOpen, partClose := f.LinePartTags(part, stress)
+		sb.WriteString(partOpen)
+		if syllables != nil {
+			if stress >= 0 && len(syllables) > 1 {
+				for j, syllable := range syllables {
+					if j == stress {
+						sb.WriteString(stressOpen)
+						sb.WriteString(syllable)
+						sb.WriteString(stressClose)
+					} else {
+						sb.WriteString(syllable)
 					}
 				}
-
-				// Check if it's a si-verb
-				entries, _ := dict.LookupEntries(line[p2].Raw + " " + line[i].Raw)
-				foundSiVerb := false
-				for _, entry := range entries {
-					if strings.HasSuffix(entry.Word, " si") || strings.HasSuffix(entry.Word, " säpi") || strings.HasSuffix(entry.Word, " seyki") || strings.HasSuffix(entry.Word, " säpeyki") {
-						foundSiVerb = true
-					}
-				}
-				if !foundSiVerb {
-					continue
-				}
-
-				if !isCopied {
-					isCopied = true
-					newLine = append(newLine[:0:0], newLine...)
-					for j := range newLine {
-						newLine[j].Matches = append(newLine[j].Matches[:0:0], newLine[j].Matches...)
-					}
-				}
-
-				// Unstress the word (rä'ä might need this as well, but it's not explicitly defined)
-				if isKe {
-					for j := range line[p2].Matches {
-						newLine[p2].Matches[j].Stress = -1
-					}
-
-					// Stress the "ke"
-					for j, match := range line[p].Matches {
-						if match.Entry.Word == "ke" {
-							newLine[p].Matches[j].StressedWord = true
-							break
-						}
-					}
-				}
-
-				// Unstress the si
-				for j := range line[i].Matches {
-					newLine[i].Matches[j].Stress = -1
-				}
+			} else {
+				sb.WriteString(part.Raw)
 			}
+		} else {
+			sb.WriteString(part.Raw)
 		}
+
+		sb.WriteString(partClose)
 	}
 
-	return newLine
-}
-
-func (line Line) prevWord(i int) int {
-	for j := i - 1; j >= 0; j-- {
-		if line[j].IsWord {
-			return j
-		} else if len(strings.Trim(line[j].Raw, "  ")) > 0 {
-			// sentence or clause boundary, most likely.
-			break
-		}
-	}
-
-	return -1
+	return sb.String()
 }
 
 // ParseLine splits out the words from a line of text.
@@ -205,14 +166,37 @@ type LinePart struct {
 	Matches []LinePartMatch `json:"matches,omitempty"`
 }
 
-func (part *LinePart) matchesWord(word string) bool {
-	for _, match := range part.Matches {
-		if match.Entry.Word == word {
-			return true
+func (part *LinePart) GetSyllables(selection int) ([]string, int) {
+	// If it's not a word, there's no need for syllables
+	if !part.IsWord {
+		return nil, LPSNotWord
+	}
+
+	// If there are no matches, there is nothing to return.
+	if len(part.Matches) == 0 {
+		return nil, LPSNoMatches
+	}
+
+	// If there is a valid selection, take the selected part.
+	if selection >= 0 && selection < len(part.Matches) {
+		return part.Matches[selection].Syllables, part.Matches[selection].Stress
+	}
+
+	// If there is no selection, allow only if every match agree on stress.
+	first := part.Matches[0]
+	for _, match := range part.Matches[1:] {
+		if match.Stress != first.Stress {
+			// If there are multiple stresses
+			// a last any option should be allowed for ìlä, tsatseng, ayfo, etc...
+			if selection == len(part.Matches) {
+				return part.Matches[0].Syllables, LPSAnyStress
+			}
+
+			return nil, LPSAmbiguousMatches
 		}
 	}
 
-	return false
+	return part.Matches[0].Syllables, part.Matches[0].Stress
 }
 
 type LinePartMatch struct {
@@ -220,4 +204,14 @@ type LinePartMatch struct {
 	Stress       int      `json:"stress"`
 	Entry        Entry    `json:"entry"`
 	StressedWord bool     `json:"stressedWord,omitempty"`
+}
+
+const LPSNoMatches = -2
+const LPSAmbiguousMatches = -3
+const LPSNotWord = -4
+const LPSAnyStress = -5
+
+type LineFormatter interface {
+	LinePartTags(lp LinePart, stress int) (string, string)
+	StressedSyllableTags() (string, string)
 }
