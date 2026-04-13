@@ -37,6 +37,10 @@ var dummyDictionary = DummyDictionary{
 	"uvan soli":     *ParseEntry("u.*van si: <ol>"),
 	"po soli":       *ParseEntry("po"),
 	"po soli:0":     *ParseEntry("si: <ol>"),
+	"tslolam":       *ParseEntry("tsl··am: <ol>"),
+	"futa":          *ParseEntry("*fu.ta"),
+	"frapo":         *ParseEntry("*fra.po"),
+	"frapo:0":       *ParseEntry("po: fra-"),
 }
 
 var lineOelNgatiKameie = Line{
@@ -163,6 +167,40 @@ func TestRunLine(t *testing.T) {
 				LinePart{Raw: "."},
 			},
 		},
+		{
+			input: "Tslolam oel futa ke frapo ke tslolam.",
+			expected: Line{
+				LinePart{Raw: "Tslolam", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"Tslo", "lam"}, 1, dummyDictionary["tslolam"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "oel", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"oel"}, 0, dummyDictionary["oel"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "futa", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"fu", "ta"}, 0, dummyDictionary["futa"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "ke", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"ke"}, 0, dummyDictionary["ke"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "frapo", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"fra", "po"}, 0, dummyDictionary["frapo"], false},
+					{[]string{"fra", "po"}, 1, dummyDictionary["frapo:0"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "ke", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"ke"}, 0, dummyDictionary["ke"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "tslolam", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"tslo", "lam"}, 1, dummyDictionary["tslolam"], false},
+				}},
+				LinePart{Raw: "."},
+			},
+		},
 	}
 
 	for _, row := range table {
@@ -174,10 +212,31 @@ func TestRunLine(t *testing.T) {
 			assert.Equal(t, row.expected, res)
 		})
 	}
+
+	t.Run("_all_as_RunLines", func(t *testing.T) {
+		input := make([]string, 0)
+		expected := make([]Line, 0)
+		for _, row := range table {
+			input = append(input, row.input)
+			expected = append(expected, row.expected)
+		}
+
+		res, err := RunLines(input, dummyDictionary)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, res)
+	})
 }
 
 func TestRunLine_Fail(t *testing.T) {
 	line, err := RunLine("Kaltxì, ma kifkey!", BrokenDictionary{})
+
+	assert.Error(t, err)
+	assert.Nil(t, line)
+	assert.NotErrorIs(t, err, ErrEntryNotFound)
+}
+
+func TestRunLines_Fail(t *testing.T) {
+	line, err := RunLines([]string{"Kaltxì, ma kifkey!"}, BrokenDictionary{})
 
 	assert.Error(t, err)
 	assert.Nil(t, line)

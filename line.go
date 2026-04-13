@@ -12,46 +12,30 @@ func RunLine(line string, dictionary Dictionary) (Line, error) {
 	return ParseLine(line).Run(dictionary)
 }
 
+// RunLines runs multiple lines, but sharing the cache between them to save on computation and dictionary calls for repeated words.
+func RunLines(lines []string, dictionary Dictionary) ([]Line, error) {
+	dictCache := make(map[string][]Entry, 128)
+	runCache := make(map[string][]LinePartMatch, 128)
+	results := make([]Line, 0, len(lines))
+
+	for _, line := range lines {
+		result, err := ParseLine(line).runWithCache(dictionary, dictCache, runCache)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, result)
+	}
+
+	return results, nil
+}
+
 type Line []LinePart
 
 func (line Line) Run(dict Dictionary) (Line, error) {
-	newLine := append(line[:0:0], line...)
-
-	for i, part := range newLine {
-		if !part.IsWord {
-			continue
-		}
-
-		lookup := part.Raw
-		if part.Lookup != "" {
-			lookup = part.Lookup
-		}
-
-		lookup = strings.ToLower(lookup)
-
-		results, err := dict.LookupEntries(lookup)
-		if err != nil {
-			if errors.Is(err, ErrEntryNotFound) {
-				continue
-			}
-
-			return nil, fmt.Errorf("failed to lookup \"%s\": %w", lookup, err)
-		}
-
-		newLine[i].Matches = make([]LinePartMatch, 0, len(results))
-		for _, result := range results {
-			syllables, stress := RunWord(part.Raw, result)
-			if syllables != nil {
-				newLine[i].Matches = append(newLine[i].Matches, LinePartMatch{
-					Syllables: syllables,
-					Stress:    stress,
-					Entry:     result,
-				})
-			}
-		}
-	}
-
-	return newLine, nil
+	dictCache := make(map[string][]Entry, len(line))
+	runCache := make(map[string][]LinePartMatch, len(line))
+	return line.runWithCache(dict, dictCache, runCache)
 }
 
 func (line Line) Format(f LineFormatter, selections map[int]int) string {
@@ -157,6 +141,58 @@ func ParseLine(s string) Line {
 	}
 
 	return res
+}
+
+func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, runCache map[string][]LinePartMatch) (Line, error) {
+	newLine := append(line[:0:0], line...)
+
+	for i, part := range newLine {
+		if !part.IsWord {
+			continue
+		}
+
+		lookup := part.Raw
+		if part.Lookup != "" {
+			lookup = part.Lookup
+		}
+
+		lookup = strings.ToLower(lookup)
+
+		results, ok := dictCache[lookup]
+		if !ok {
+			dictResults, err := dict.LookupEntries(lookup)
+			if err != nil {
+				if errors.Is(err, ErrEntryNotFound) {
+					continue
+				}
+
+				return nil, fmt.Errorf("failed to lookup \"%s\": %w", lookup, err)
+			}
+
+			dictCache[lookup] = dictResults
+			results = dictResults
+		}
+
+		if matches, ok := runCache[part.Raw]; ok {
+			newLine[i].Matches = matches
+		} else {
+			newLine[i].Matches = make([]LinePartMatch, 0, len(results))
+			for _, result := range results {
+				syllables, stress := RunWord(part.Raw, result)
+				if syllables != nil {
+					newLine[i].Matches = append(newLine[i].Matches, LinePartMatch{
+						Syllables: syllables,
+						Stress:    stress,
+						Entry:     result,
+					})
+				}
+			}
+
+			runCache[part.Raw] = newLine[i].Matches
+		}
+	}
+
+	return newLine, nil
 }
 
 type LinePart struct {
