@@ -215,6 +215,27 @@ func TestRunWord(t *testing.T) {
 			Raw: "telisit", Entry: "te.li.*si: -t",
 			Res: "te.li.sit", ResStress: 2,
 		},
+		{
+			Raw: "Etxäle", Entry: "e.*txä.le",
+			Res: "E.txä.le", ResStress: 1,
+		},
+		{
+			Raw: "eie", Entry: "ä.*i.e",
+			Res: "e.i.e", ResStress: 1,
+		},
+		{
+			Raw: "kamä", Entry: "k··ä: <am>",
+			Res: "ka.mä", ResStress: 1,
+		},
+
+		{
+			Raw: "Ensit", Entry: "*än.sìt",
+			Res: "", ResStress: -1,
+		},
+		{
+			Raw: "Kame", Entry: "k··ä: <am>",
+			Res: "", ResStress: -1,
+		},
 	}
 
 	for _, row := range table {

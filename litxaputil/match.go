@@ -27,7 +27,7 @@ func matchSyllables(word string, syllables []string, root, stress int, allowFuse
 	rootOffset := root
 
 	for len(syllables) > 0 || len(curr) > 0 {
-		matchedSyllables, next, n, stressPush := nextSyllable(curr, syllables, rootOffset >= 0, allowFuse)
+		matchedSyllables, next, n, stressPush := nextSyllable(curr, syllables, rootOffset >= 0, allowFuse, stressOffset)
 		if n == 0 {
 			newSyllables = nil
 			newStress = -1
@@ -59,7 +59,7 @@ func matchSyllables(word string, syllables []string, root, stress int, allowFuse
 	return
 }
 
-func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse bool) ([]string, string, int, int) {
+func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse bool, stressOffset int) ([]string, string, int, int) {
 	if len(syllables) == 0 || len(curr) == 0 {
 		return nil, curr, 0, 0
 	}
@@ -67,7 +67,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 
 	// Spaces
 	if strings.HasPrefix(curr, " ") {
-		matchedSyllables, next, n, stressOffset := nextSyllable(strings.TrimLeft(curr, " "), syllables, allowLenition, allowFuse)
+		matchedSyllables, next, n, stressOffset := nextSyllable(strings.TrimLeft(curr, " "), syllables, allowLenition, allowFuse, stressOffset)
 		if n > 0 {
 			matchedSyllables = append([]string{" "}, matchedSyllables...)
 		}
@@ -128,7 +128,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		prev0 := syllables[0]
 		syllables[0] = syllables[0] + "-"
 
-		matchedSyllables, next, n, n2 := nextSyllable(curr, syllables, allowLenition, allowFuse)
+		matchedSyllables, next, n, n2 := nextSyllable(curr, syllables, allowLenition, allowFuse, stressOffset)
 		syllables[0] = prev0
 		if n > 0 {
 			matchedSyllables[0] += "-"
@@ -177,7 +177,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		syllables = append(syllables[:0:0], syllables...)
 		syllables[0] = syllables[0][1:]
 
-		if matchedSyllables, next, n, n2 := nextSyllable(curr, syllables, allowLenition, allowFuse); n > 0 {
+		if matchedSyllables, next, n, n2 := nextSyllable(curr, syllables, allowLenition, allowFuse, stressOffset); n > 0 {
 			return matchedSyllables, next, n, n2
 		}
 	}
@@ -208,9 +208,14 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 		if syllable := strings.ReplaceAll(syllable, "u", "ù"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
 			return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
 		}
+	}
 
-		if syllable := strings.ReplaceAll(syllable, "ä", "e"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
-			return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
+	// Reef Na'vi: ä->e
+	if stressOffset != 0 {
+		for _, syllable := range [4]string{syllables[0], withEjectives, withFinalEjectives, withShCh} {
+			if syllable := strings.ReplaceAll(syllable, "ä", "e"); syllable != syllables[0] && strings.HasPrefix(currLower, syllable) {
+				return []string{curr[:len(syllable)]}, curr[len(syllable):], 1, 1
+			}
 		}
 	}
 

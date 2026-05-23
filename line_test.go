@@ -41,6 +41,8 @@ var dummyDictionary = DummyDictionary{
 	"futa":          *ParseEntry("*fu.ta"),
 	"frapo":         *ParseEntry("*fra.po"),
 	"frapo:0":       *ParseEntry("po: fra-"),
+	"Fmetan":        *ParseEntry("*fme.tan"),
+	"Fmetan:0":      *ParseEntry("fme.*tan"),
 }
 
 var lineOelNgatiKameie = Line{
@@ -54,7 +56,6 @@ var lineOelNgatiKameie = Line{
 	LinePart{Raw: " "},
 	LinePart{Raw: "kameie", IsWord: true, Matches: []LinePartMatch{
 		{[]string{"ka", "me", "i", "e"}, 0, dummyDictionary["kameie"], false},
-		{[]string{"ka", "me", "i", "e"}, 3, dummyDictionary["kameie:0"], false},
 	}},
 	LinePart{Raw: "."},
 }
@@ -70,6 +71,22 @@ var lineKaltxiMaFmetokyu = Line{
 	LinePart{Raw: " "},
 	LinePart{Raw: "fmetokyu", IsWord: true, Matches: []LinePartMatch{
 		{[]string{"fme", "tok", "yu"}, 0, dummyDictionary["fmetokyu"], false},
+	}},
+	LinePart{Raw: "!"},
+}
+
+var lineKaltxiMaFmetan = Line{
+	LinePart{Raw: "Kaltxì", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Kal", "txì"}, 1, dummyDictionary["kaltxì"], false},
+	}},
+	LinePart{Raw: ", "},
+	LinePart{Raw: "ma", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"ma"}, 0, dummyDictionary["ma"], false},
+	}},
+	LinePart{Raw: " "},
+	LinePart{Raw: "Fmetan", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Fme", "tan"}, 0, dummyDictionary["fmetan"], false},
+		{[]string{"Fme", "tan"}, 1, dummyDictionary["fmetan:0"], false},
 	}},
 	LinePart{Raw: "!"},
 }
@@ -372,9 +389,11 @@ func TestLine_Format(t *testing.T) {
 		output     string
 		selections map[int]int
 	}{
-		{lineOelNgatiKameie, "[S]Oel[/S] [S]{nga}ti[/S] [AM]kameie[/AM].", nil},
-		{lineOelNgatiKameie, "[S]Oel[/S] [S]{nga}ti[/S] [S]{ka}meie[/S].", map[int]int{4: 0}},
+		{lineOelNgatiKameie, "[S]Oel[/S] [S]{nga}ti[/S] [S]{ka}meie[/S].", nil},
 		{lineKaltxiMaFmetokyu, "[S]Kal{txì}[/S], [S]ma[/S] [S]{fme}tokyu[/S]!", nil},
+		{lineKaltxiMaFmetan, "[S]Kal{txì}[/S], [S]ma[/S] [AM]Fmetan[/AM]!", map[int]int{999999: 1}},
+		{lineKaltxiMaFmetan, "[S]Kal{txì}[/S], [S]ma[/S] [S]{Fme}tan[/S]!", map[int]int{4: 0}},
+		{lineKaltxiMaFmetan, "[S]Kal{txì}[/S], [S]ma[/S] [S]Fme{tan}[/S]!", map[int]int{4: 1}},
 		{lineVolaSkeynven, "[S]{Vo}la[/S] [NM]skeynven[/NM].", nil},
 		{lineFikemIlaFyao, "[S]Fì{kem}[/S] [AS]ìlä[/AS] [S]{fya}'o[/S]!", map[int]int{2: 2}},
 	}
