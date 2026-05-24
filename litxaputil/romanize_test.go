@@ -1,12 +1,15 @@
 package litxaputil
 
 import (
+	"fmt"
+	"slices"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRomanize(t *testing.T) {
+func TestRomanizeIPA(t *testing.T) {
 	table := []struct {
 		curr     string
 		expected [][][]string
@@ -76,4 +79,101 @@ func TestRomanize(t *testing.T) {
 			assert.Equal(t, row.stress, stress)
 		})
 	}
+}
+
+func TestSyllableToIPA(t *testing.T) {
+	table := []struct {
+		input    string
+		expected string
+	}{
+		{"tskxe", "t͡sk'ɛ"},
+		{"keng", "kɛŋ"},
+		{"fme", "fmɛ"},
+		{"tok", "tok̚"},
+		{"lawr", "lawɾ"},
+		{"ran", "ɾan"},
+		{"syon", "sjon"},
+		{"tsway", "t͡swaj"},
+		{"on", "on"},
+		{"u", "u"},
+		{"van", "van"},
+	}
+
+	for _, row := range table {
+		t.Run(row.expected, func(t *testing.T) {
+			res, err := SyllableToIPA(row.input)
+			assert.NoError(t, err)
+			assert.Equal(t, row.expected, res)
+		})
+	}
+}
+
+func TestSyllablesToIPA(t *testing.T) {
+	table := []struct {
+		input            string
+		delimiter        string
+		strongEmphasises []int
+		weakEmphasises   []int
+		expected         string
+	}{
+		{"fme.tok", ".", []int{0}, []int{}, "ˈfmɛ.tok̚"},
+		{"tsak.tap", ".", []int{0}, []int{}, "ˈt͡sak̚.tap̚"},
+		{"tal.i.o.ang", ".", []int{0}, []int{2}, "ˈtal.i.ˌo.aŋ"},
+		{"shawm", ".", []int{}, []int{}, "ʃawm"},
+		{"syu.ra", ".", []int{1}, []int{}, "sju.ˈɾa"},
+		{"tsyey.tsyìp", ".", []int{0}, []int{}, "ˈt͡sjɛj.t͡sjɪp̚"},
+		{"chey.chìp", ".", []int{0}, []int{}, "ˈtʃɛj.tʃɪp̚"},
+		{"zaw.prr.te'", "-", []int{1}, []int{}, "zaw-ˈpṛ-tɛʔ"},
+		{"me.o.a.u.ni.a.e.a", "", []int{6}, []int{0}, "ˌmɛoauniaˈɛa"},
+	}
+
+	for _, row := range table {
+		t.Run(row.expected, func(t *testing.T) {
+			res, err := SyllablesToIPA(
+				strings.Split(row.input, "."),
+				row.delimiter,
+				row.strongEmphasises,
+				row.weakEmphasises,
+			)
+
+			assert.NoError(t, err)
+			assert.Equal(t, row.expected, res)
+		})
+	}
+}
+
+func TestWriteSyllablesAsIPATo_Errors(t *testing.T) {
+	set := []string{"ˌ", "k", "a", "l", ".", "ˈ", "t'", "ɪ", "t", "f", "m", "ɛ", "t", "o", "k", "̚"}
+
+	for i := range set {
+		assert.Error(t, WriteSyllablesAsIPATo(
+			&badStringWriter{whitelist: set[:i]},
+			[]string{"kal", "txì", "ma", "tì", "fme", "tok"},
+			".", []int{1, 4}, []int{0},
+		))
+	}
+
+	assert.NoError(t, WriteSyllablesAsIPATo(
+		&badStringWriter{whitelist: set},
+		[]string{"kal", "txì"},
+		".", []int{1}, []int{0},
+	))
+
+	assert.Error(t, WriteSyllablesAsIPATo(
+		&badStringWriter{whitelist: set},
+		[]string{"txxap"},
+		".", []int{1, 4}, []int{0},
+	))
+}
+
+type badStringWriter struct {
+	whitelist []string
+}
+
+func (b *badStringWriter) WriteString(s string) (n int, err error) {
+	if slices.Contains(b.whitelist, s) {
+		return len(s), nil
+	}
+
+	return 0, fmt.Errorf("badStringWriter-ìl ke tung fìpamrelit alu: %s", s)
 }

@@ -2,6 +2,9 @@ package litxaputil
 
 import (
 	"bytes"
+	"fmt"
+	"io"
+	"slices"
 	"strings"
 	"unicode/utf8"
 )
@@ -205,4 +208,112 @@ var romanizaionTable = map[string]string{
 	"ʃ": "sh", "tʃ": "ch", "ʊ": "ù",
 	// mistakes and rarities
 	"ʒ": "ch", "": "", " ": "",
+}
+
+func SyllableToIPA(syllable string) (string, error) {
+	res := &strings.Builder{}
+	res.Grow(len(syllable) * 2)
+	err := WriteSyllableAsIPATo(res, syllable)
+	return res.String(), err
+}
+
+func WriteSyllableAsIPATo(w io.StringWriter, syllable string) error {
+	current := syllable
+	for current != "" {
+		// ts = ["t", "ts"]
+		var tableKeys [2]string
+		for i := range current {
+			for j := range tableKeys {
+				if tableKeys[j] == "" {
+					tableKeys[j] = current[:i]
+					break
+				}
+			}
+			if tableKeys[1] != "" {
+				break
+			}
+		}
+		if tableKeys[0] == "" {
+			tableKeys[0] = current
+		} else if tableKeys[1] == "" {
+			tableKeys[1] = current
+		}
+
+		if tableKeys[1] != "" && romanizaionTableReverse[tableKeys[1]] != "" {
+			_, err := w.WriteString(romanizaionTableReverse[tableKeys[1]])
+			if err != nil {
+				return err
+			}
+
+			current = strings.TrimPrefix(current, tableKeys[1])
+		} else if tableKeys[0] != "" && romanizaionTableReverse[tableKeys[0]] != "" {
+			_, err := w.WriteString(romanizaionTableReverse[tableKeys[0]])
+			if err != nil {
+				return err
+			}
+
+			if current == "k" || current == "p" || current == "t" {
+				_, err := w.WriteString("̚")
+				if err != nil {
+					return err
+				}
+			}
+
+			current = strings.TrimPrefix(current, tableKeys[0])
+		} else {
+			return fmt.Errorf("unknown symbol %s in syllable %s", tableKeys[1], syllable)
+		}
+	}
+
+	return nil
+}
+
+func SyllablesToIPA(syllables []string, syllableDelimiter string, strongEmphasises []int, weakEmphasises []int) (string, error) {
+	res := &strings.Builder{}
+	res.Grow(len(syllables) * 8)
+	err := WriteSyllablesAsIPATo(res, syllables, syllableDelimiter, strongEmphasises, weakEmphasises)
+	return res.String(), err
+}
+
+func WriteSyllablesAsIPATo(w io.StringWriter, syllables []string, syllableDelimiter string, strongEmphasises []int, weakEmphasises []int) error {
+	for i, syllable := range syllables {
+		if i > 0 && syllableDelimiter != "" {
+			_, err := w.WriteString(syllableDelimiter)
+			if err != nil {
+				return err
+			}
+		}
+
+		if slices.Contains(strongEmphasises, i) {
+			_, err := w.WriteString("ˈ")
+			if err != nil {
+				return err
+			}
+		} else if slices.Contains(weakEmphasises, i) {
+			_, err := w.WriteString("ˌ")
+			if err != nil {
+				return err
+			}
+		}
+
+		err := WriteSyllableAsIPATo(w, syllable)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+var romanizaionTableReverse map[string]string
+
+func init() {
+	romanizaionTableReverse = make(map[string]string, len(romanizaionTable))
+	for key, value := range romanizaionTable {
+		romanizaionTableReverse[value] = key
+	}
+	delete(romanizaionTable, "")
+	delete(romanizaionTable, " ")
+	romanizaionTableReverse["r"] = "ɾ"
+	romanizaionTableReverse["ch"] = "tʃ"
 }
