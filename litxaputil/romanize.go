@@ -261,7 +261,7 @@ func WriteSyllableAsIPATo(w io.StringWriter, syllable string) error {
 
 			current = strings.TrimPrefix(current, tableKeys[0])
 		} else {
-			return fmt.Errorf("unknown symbol %s in syllable %s", tableKeys[1], syllable)
+			return fmt.Errorf("unknown symbols [%#v, %#v] in syllable %s", tableKeys[0], tableKeys[1], syllable)
 		}
 	}
 
@@ -316,4 +316,7 @@ func init() {
 	delete(romanizaionTable, " ")
 	romanizaionTableReverse["r"] = "ɾ"
 	romanizaionTableReverse["ch"] = "tʃ"
+	romanizaionTableReverse["b"] = "b"
+	romanizaionTableReverse["d"] = "d"
+	romanizaionTableReverse["g"] = "g"
 }

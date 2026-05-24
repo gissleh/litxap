@@ -123,6 +123,8 @@ func TestSyllablesToIPA(t *testing.T) {
 		{"syu.ra", ".", []int{1}, []int{}, "sju.ˈɾa"},
 		{"tsyey.tsyìp", ".", []int{0}, []int{}, "ˈt͡sjɛj.t͡sjɪp̚"},
 		{"chey.chìp", ".", []int{0}, []int{}, "ˈtʃɛj.tʃɪp̚"},
+		{"ad.ge", ".", []int{1}, []int{}, "ad.ˈgɛ"},
+		{"a.ba", ".", []int{1}, []int{}, "a.ˈba"},
 		{"zaw.prr.te'", "-", []int{1}, []int{}, "zaw-ˈpṛ-tɛʔ"},
 		{"me.o.a.u.ni.a.e.a", "", []int{6}, []int{0}, "ˌmɛoauniaˈɛa"},
 	}
@@ -159,11 +161,11 @@ func TestWriteSyllablesAsIPATo_Errors(t *testing.T) {
 		".", []int{1}, []int{0},
 	))
 
-	assert.Error(t, WriteSyllablesAsIPATo(
+	assert.ErrorContains(t, WriteSyllablesAsIPATo(
 		&badStringWriter{whitelist: set},
 		[]string{"txxap"},
-		".", []int{1, 4}, []int{0},
-	))
+		".", []int{}, []int{},
+	), "unknown symbols [\"x\", \"xa\"] in syllable txxap")
 }
 
 type badStringWriter struct {
