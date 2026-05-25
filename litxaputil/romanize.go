@@ -218,6 +218,11 @@ func SyllableToIPA(syllable string) (string, error) {
 }
 
 func WriteSyllableAsIPATo(w io.StringWriter, syllable string) error {
+	// Odd edge cases
+	if edgeCase, ok := syllableEdgeCases[syllable]; ok {
+		syllable = edgeCase
+	}
+
 	current := syllable
 	for current != "" {
 		// ts = ["t", "ts"]
@@ -266,6 +271,15 @@ func WriteSyllableAsIPATo(w io.StringWriter, syllable string) error {
 	}
 
 	return nil
+}
+
+var syllableEdgeCases = map[string]string{
+	// These syllables are only presented like this for the pronouns
+	"oe":   "we",
+	"oel":  "wel",
+	"oet":  "wet",
+	"oer":  "wer",
+	"oeng": "weng",
 }
 
 func SyllablesToIPA(syllables []string, syllableDelimiter string, strongEmphasises []int, weakEmphasises []int) (string, error) {
@@ -319,4 +333,5 @@ func init() {
 	romanizaionTableReverse["b"] = "b"
 	romanizaionTableReverse["d"] = "d"
 	romanizaionTableReverse["g"] = "g"
+	romanizaionTableReverse["é"] = romanizaionTableReverse["e"]
 }

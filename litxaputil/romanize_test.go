@@ -125,6 +125,8 @@ func TestSyllablesToIPA(t *testing.T) {
 		{"chey.chìp", ".", []int{0}, []int{}, "ˈtʃɛj.tʃɪp̚"},
 		{"ad.ge", ".", []int{1}, []int{}, "ad.ˈgɛ"},
 		{"a.ba", ".", []int{1}, []int{}, "a.ˈba"},
+		{"oeng", ".", []int{}, []int{}, "wɛŋ"},
+		{"oe.nge.yä", ".", []int{0}, []int{}, "ˈwɛ.ŋɛ.jæ"},
 		{"zaw.prr.te'", "-", []int{1}, []int{}, "zaw-ˈpṛ-tɛʔ"},
 		{"me.o.a.u.ni.a.e.a", "", []int{6}, []int{0}, "ˌmɛoauniaˈɛa"},
 	}

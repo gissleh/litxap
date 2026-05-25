@@ -1,6 +1,7 @@
 package litxap
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,6 +10,7 @@ import (
 var dummyDictionary = DummyDictionary{
 	"kaltxì":        *ParseEntry("kal.*txì"),
 	"ma":            *ParseEntry("ma"),
+	"fmetok":        *ParseEntry("fme.tok"),
 	"fmetokyu":      *ParseEntry("fme.tok: -yu"),
 	"ayhapxìtu":     *ParseEntry("ha.*pxì.tu: ay-"),
 	"soaiä":         *ParseEntry("so.*a.i.a: -ä"),
@@ -98,6 +100,12 @@ var lineVolaSkeynven = Line{
 	LinePart{Raw: " "},
 	LinePart{Raw: "skeynven", IsWord: true},
 	LinePart{Raw: "."},
+}
+
+var lineFmetokBad = Line{
+	LinePart{Raw: "Vola", IsWord: true, Matches: []LinePartMatch{
+		{[]string{"Fme", "tök"}, 0, dummyDictionary["fmetok"], false},
+	}},
 }
 
 func TestRunLine(t *testing.T) {
@@ -401,6 +409,36 @@ func TestLine_Format(t *testing.T) {
 	for _, row := range table {
 		t.Run(row.output, func(t *testing.T) {
 			assert.Equal(t, row.output, row.input.Format(&dummyLineFormatter{}, row.selections))
+		})
+	}
+}
+
+func TestLine_IPA(t *testing.T) {
+	table := []struct {
+		input      Line
+		output     string
+		selections map[int]int
+		err        string
+	}{
+		{lineOelNgatiKameie, "wɛl ˈŋati ˈkamɛiɛ.", nil, ""},
+		{lineKaltxiMaFmetokyu, "kalˈt'ɪ, ma ˈfmɛtok̚ju!", nil, ""},
+		{lineFikemIlaFyao, "fɪˈkɛm ˈɪlæ ˈfjaʔo!", map[int]int{2: 2}, ""},
+		{lineKaltxiMaFmetan, "kalˈt'ɪ, ma ˈfmɛtan!", map[int]int{4: 0}, ""},
+		{lineKaltxiMaFmetan, "kalˈt'ɪ, ma fmɛˈtan!", map[int]int{4: 1}, ""},
+		{lineVolaSkeynven, "", nil, fmt.Sprintf("no matches for line[%d] (%#+v)", 2, "skeynven")},
+		{lineFmetokBad, "", nil, "unknown symbols [\"ö\", \"ök\"] in syllable tök"},
+	}
+
+	for _, row := range table {
+		t.Run(row.output, func(t *testing.T) {
+			output, err := row.input.IPA(row.selections)
+
+			if row.err != "" {
+				assert.ErrorContains(t, err, row.err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, row.output, output)
+			}
 		})
 	}
 }

@@ -3,9 +3,12 @@ package litxap
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/gissleh/litxap/litxaputil"
 )
 
 func RunLine(line string, dictionary Dictionary) (Line, error) {
@@ -73,6 +76,43 @@ func (line Line) Format(f LineFormatter, selections map[int]int) string {
 	}
 
 	return sb.String()
+}
+
+func (line Line) IPA(selections map[int]int) (string, error) {
+	sb := &strings.Builder{}
+	sb.Grow(len(line) * 8)
+
+	for i, part := range line {
+		if part.IsWord {
+			if len(part.Matches) == 0 {
+				return "", fmt.Errorf("no matches for line[%d] (%#+v)", i, part.Raw)
+			}
+
+			selection := part.Matches[0]
+			if selections[i] != 0 && selections[i] < len(part.Matches) {
+				selection = part.Matches[selections[i]]
+			}
+
+			syllables := slices.Clone(selection.Syllables)
+			for j := range syllables {
+				syllables[j] = strings.ToLower(syllables[j])
+			}
+
+			stress := selection.Stress
+			if len(selection.Syllables) == 1 {
+				stress = -1
+			}
+
+			err := litxaputil.WriteSyllablesAsIPATo(sb, syllables, "", []int{stress}, []int{})
+			if err != nil {
+				return "", err
+			}
+		} else {
+			sb.WriteString(part.Raw)
+		}
+	}
+
+	return sb.String(), nil
 }
 
 // ParseLine splits out the words from a line of text.
