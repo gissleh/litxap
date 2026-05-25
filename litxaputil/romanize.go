@@ -333,5 +333,10 @@ func init() {
 	romanizaionTableReverse["b"] = "b"
 	romanizaionTableReverse["d"] = "d"
 	romanizaionTableReverse["g"] = "g"
+	romanizaionTableReverse["tx"] = "tʼ"
+	romanizaionTableReverse["px"] = "pʼ"
+	romanizaionTableReverse["kx"] = "kʼ"
+	romanizaionTableReverse["rr"] = "r̩"
+	romanizaionTableReverse["ll"] = "l̩"
 	romanizaionTableReverse["é"] = romanizaionTableReverse["e"]
 }

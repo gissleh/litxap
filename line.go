@@ -232,6 +232,31 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 		}
 	}
 
+	// Edge case: oe + any word starting with u
+	for i, part := range newLine {
+		if i == len(newLine)-2 {
+			break
+		}
+		if !part.IsWord {
+			continue
+		}
+		nextPart := newLine[i+2]
+
+		for j, match := range part.Matches {
+			if match.Entry.Word == "oe" && strings.ToLower(strings.Join(match.Syllables, ".")) == "o.e" {
+				for _, start := range []string{"u", "U", "ù", "Ù"} {
+					if strings.HasPrefix(nextPart.Raw, start) {
+						newLine[i].Matches = slices.Clone(newLine[i].Matches)
+						newLine[i].Matches[j].Syllables = []string{strings.Join(match.Syllables, "")}
+						break
+					}
+				}
+
+				break
+			}
+		}
+	}
+
 	return newLine, nil
 }
 

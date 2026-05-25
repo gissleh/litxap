@@ -35,8 +35,11 @@ var dummyDictionary = DummyDictionary{
 	"ikranhu":       *ParseEntry("ik.ran: -hu"),
 	"ke":            *ParseEntry("ke"),
 	"a":             *ParseEntry("a"),
+	"oe":            *ParseEntry("*o.e"),
+	"tsaktap":       *ParseEntry("*tsak.tap"),
 	"uvan":          *ParseEntry("u.*van"),
-	"uvan soli":     *ParseEntry("u.*van si: <ol>"),
+	"si":            *ParseEntry("s··i"),
+	"uvan soli":     *ParseEntry("u.*van s··i: <ol>"),
 	"po soli":       *ParseEntry("po"),
 	"po soli:0":     *ParseEntry("si: <ol>"),
 	"tslolam":       *ParseEntry("tsl··am: <ol>"),
@@ -222,6 +225,40 @@ func TestRunLine(t *testing.T) {
 				LinePart{Raw: " "},
 				LinePart{Raw: "tslolam", IsWord: true, Matches: []LinePartMatch{
 					{[]string{"tslo", "lam"}, 1, dummyDictionary["tslolam"], false},
+				}},
+				LinePart{Raw: "."},
+			},
+		},
+		{
+			input: "Oe tsaktap si.",
+			expected: Line{
+				LinePart{Raw: "Oe", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"O", "e"}, 0, dummyDictionary["oe"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "tsaktap", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"tsak", "tap"}, 0, dummyDictionary["tsaktap"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "si", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"si"}, 0, dummyDictionary["si"], false},
+				}},
+				LinePart{Raw: "."},
+			},
+		},
+		{
+			input: "Oe uvan si.",
+			expected: Line{
+				LinePart{Raw: "Oe", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"Oe"}, 0, dummyDictionary["oe"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"u", "van"}, 1, dummyDictionary["uvan"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "si", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"si"}, 0, dummyDictionary["si"], false},
 				}},
 				LinePart{Raw: "."},
 			},
@@ -421,10 +458,10 @@ func TestLine_IPA(t *testing.T) {
 		err        string
 	}{
 		{lineOelNgatiKameie, "wɛl ˈŋati ˈkamɛiɛ.", nil, ""},
-		{lineKaltxiMaFmetokyu, "kalˈt'ɪ, ma ˈfmɛtok̚ju!", nil, ""},
+		{lineKaltxiMaFmetokyu, "kalˈtʼɪ, ma ˈfmɛtok̚ju!", nil, ""},
 		{lineFikemIlaFyao, "fɪˈkɛm ˈɪlæ ˈfjaʔo!", map[int]int{2: 2}, ""},
-		{lineKaltxiMaFmetan, "kalˈt'ɪ, ma ˈfmɛtan!", map[int]int{4: 0}, ""},
-		{lineKaltxiMaFmetan, "kalˈt'ɪ, ma fmɛˈtan!", map[int]int{4: 1}, ""},
+		{lineKaltxiMaFmetan, "kalˈtʼɪ, ma ˈfmɛtan!", map[int]int{4: 0}, ""},
+		{lineKaltxiMaFmetan, "kalˈtʼɪ, ma fmɛˈtan!", map[int]int{4: 1}, ""},
 		{lineVolaSkeynven, "", nil, fmt.Sprintf("no matches for line[%d] (%#+v)", 2, "skeynven")},
 		{lineFmetokBad, "", nil, "unknown symbols [\"ö\", \"ök\"] in syllable tök"},
 	}

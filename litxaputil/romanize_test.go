@@ -86,7 +86,7 @@ func TestSyllableToIPA(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"tskxe", "t͡sk'ɛ"},
+		{"tskxe", "t͡skʼɛ"},
 		{"keng", "kɛŋ"},
 		{"fme", "fmɛ"},
 		{"tok", "tok̚"},
@@ -127,7 +127,7 @@ func TestSyllablesToIPA(t *testing.T) {
 		{"a.ba", ".", []int{1}, []int{}, "a.ˈba"},
 		{"oeng", ".", []int{}, []int{}, "wɛŋ"},
 		{"oe.nge.yä", ".", []int{0}, []int{}, "ˈwɛ.ŋɛ.jæ"},
-		{"zaw.prr.te'", "-", []int{1}, []int{}, "zaw-ˈpṛ-tɛʔ"},
+		{"zaw.prr.te'", "-", []int{1}, []int{}, "zaw-ˈpr̩-tɛʔ"},
 		{"me.o.a.u.ni.a.e.a", "", []int{6}, []int{0}, "ˌmɛoauniaˈɛa"},
 	}
 
@@ -147,7 +147,7 @@ func TestSyllablesToIPA(t *testing.T) {
 }
 
 func TestWriteSyllablesAsIPATo_Errors(t *testing.T) {
-	set := []string{"ˌ", "k", "a", "l", ".", "ˈ", "t'", "ɪ", "t", "f", "m", "ɛ", "t", "o", "k", "̚"}
+	set := []string{"ˌ", "k", "a", "l", ".", "ˈ", "tʼ", "ɪ", "t", "f", "m", "ɛ", "t", "o", "k", "̚"}
 
 	for i := range set {
 		assert.Error(t, WriteSyllablesAsIPATo(
