@@ -234,7 +234,7 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 
 	// Edge case: oe + any word starting with u
 	for i, part := range newLine {
-		if i == len(newLine)-2 {
+		if i >= len(newLine)-2 {
 			break
 		}
 		if !part.IsWord {
