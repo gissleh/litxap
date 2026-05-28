@@ -46,8 +46,8 @@ var dummyDictionary = DummyDictionary{
 	"futa":          *ParseEntry("*fu.ta"),
 	"frapo":         *ParseEntry("*fra.po"),
 	"frapo:0":       *ParseEntry("po: fra-"),
-	"Fmetan":        *ParseEntry("*fme.tan"),
-	"Fmetan:0":      *ParseEntry("fme.*tan"),
+	"fmetan":        *ParseEntry("*fme.tan"),
+	"fmetan:0":      *ParseEntry("fme.*tan"),
 }
 
 var lineOelNgatiKameie = Line{
@@ -453,22 +453,24 @@ func TestLine_Format(t *testing.T) {
 func TestLine_IPA(t *testing.T) {
 	table := []struct {
 		input      Line
+		delim      string
 		output     string
 		selections map[int]int
 		err        string
 	}{
-		{lineOelNgatiKameie, "wɛl ˈŋati ˈkamɛiɛ.", nil, ""},
-		{lineKaltxiMaFmetokyu, "kalˈtʼɪ, ma ˈfmɛtok̚ju!", nil, ""},
-		{lineFikemIlaFyao, "fɪˈkɛm ˈɪlæ ˈfjaʔo!", map[int]int{2: 2}, ""},
-		{lineKaltxiMaFmetan, "kalˈtʼɪ, ma ˈfmɛtan!", map[int]int{4: 0}, ""},
-		{lineKaltxiMaFmetan, "kalˈtʼɪ, ma fmɛˈtan!", map[int]int{4: 1}, ""},
-		{lineVolaSkeynven, "", nil, fmt.Sprintf("no matches for line[%d] (%#+v)", 2, "skeynven")},
-		{lineFmetokBad, "", nil, "unknown symbols [\"ö\", \"ök\"] in syllable tök"},
+		{lineOelNgatiKameie, "", "wɛl ˈŋati ˈkamɛiɛ.", nil, ""},
+		{lineKaltxiMaFmetokyu, "", "kalˈtʼɪ, ma ˈfmɛtok̚ju!", nil, ""},
+		{lineFikemIlaFyao, ".", "fɪ.ˈkɛm ɪ.ˈlæ ˈfja.ʔo!", map[int]int{2: 1}, ""},
+		{lineFikemIlaFyao, ".", "fɪ.ˈkɛm ˈɪ.læ ˈfja.ʔo!", map[int]int{2: 2}, ""},
+		{lineKaltxiMaFmetan, "", "kalˈtʼɪ, ma ˈfmɛtan!", map[int]int{4: 0}, ""},
+		{lineKaltxiMaFmetan, "", "kalˈtʼɪ, ma fmɛˈtan!", map[int]int{4: 1}, ""},
+		{lineVolaSkeynven, "", "", nil, fmt.Sprintf("no matches for line[%d] (%#+v)", 2, "skeynven")},
+		{lineFmetokBad, "", "", nil, "unknown symbols [\"ö\", \"ök\"] in syllable tök"},
 	}
 
 	for _, row := range table {
 		t.Run(row.output, func(t *testing.T) {
-			output, err := row.input.IPA(row.selections)
+			output, err := row.input.IPA(row.selections, row.delim)
 
 			if row.err != "" {
 				assert.ErrorContains(t, err, row.err)

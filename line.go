@@ -78,7 +78,7 @@ func (line Line) Format(f LineFormatter, selections map[int]int) string {
 	return sb.String()
 }
 
-func (line Line) IPA(selections map[int]int) (string, error) {
+func (line Line) IPA(selections map[int]int, syllableDelimiter string) (string, error) {
 	sb := &strings.Builder{}
 	sb.Grow(len(line) * 8)
 
@@ -103,7 +103,7 @@ func (line Line) IPA(selections map[int]int) (string, error) {
 				stress = -1
 			}
 
-			err := litxaputil.WriteSyllablesAsIPATo(sb, syllables, "", []int{stress}, []int{})
+			err := litxaputil.WriteSyllablesAsIPATo(sb, syllables, syllableDelimiter, []int{stress}, []int{})
 			if err != nil {
 				return "", err
 			}
