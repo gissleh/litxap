@@ -3,6 +3,7 @@ package litxapfilter
 import (
 	"slices"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -15,6 +16,11 @@ func SaeRemover(curr, next *FilterTarget) (*string, *string) {
 		return nil, nil
 	}
 
+	// Don't do this across any breaks, though.
+	if strings.Trim(curr.After, "  \t\r") != "" {
+		return nil, nil
+	}
+
 	// I don't believe it can happen across word boundaries
 	if curr.PartIndex != next.PartIndex {
 		return nil, nil
@@ -22,7 +28,7 @@ func SaeRemover(curr, next *FilterTarget) (*string, *string) {
 
 	// Only continue if the first letter can follow a pre-onset s
 	r1, l1 := utf8.DecodeRuneInString(next.Syllable)
-	if !slices.Contains(canFollowSae, r1) {
+	if !slices.Contains(canFollowSae, unicode.ToLower(r1)) {
 		return nil, nil
 	}
 

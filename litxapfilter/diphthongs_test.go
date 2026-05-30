@@ -19,6 +19,8 @@ func TestDiphthongFromWeakVowel(t *testing.T) {
 		{"me", "i", "", "mey", true},
 		{"ha", "Ìng", "", "haYng", true},
 		{"hA", "Ìng", "", "hAYng", true},
+		{"me", "Ik", "", "meYk", true},
+		{"me", "Ik", ". ", "", false},
 		{"me", "kxa", "", "", false},
 		{"me", "", "", "", false},
 		{"me", "*i", "", "", false},
@@ -63,18 +65,19 @@ func TestDiphthongFromWeakVowel(t *testing.T) {
 
 func TestReanalyzeDiphthongs(t *testing.T) {
 	table := []struct {
-		curr, next, changeCurr, changeNext string
+		curr, after, next, changeCurr, changeNext string
 	}{
-		{"ey", "e", "e", "ye"},
-		{"ay", "on", "a", "yon"},
-		{"ay", "nga", "", ""},
-		{"ay", "", "", ""},
-		{"a", "e", "", ""},
+		{"ey", "", "e", "e", "ye"},
+		{"ay", "", "on", "a", "yon"},
+		{"vey", ".", "A", "", ""},
+		{"ay", "", "nga", "", ""},
+		{"ay", "", "", "", ""},
+		{"a", "", "e", "", ""},
 	}
 
 	for _, row := range table {
-		t.Run(fmt.Sprintf("%s-%s", row.curr, row.next), func(t *testing.T) {
-			curr := &FilterTarget{Syllable: row.curr}
+		t.Run(fmt.Sprintf("%s-%s-%s", row.curr, row.after, row.next), func(t *testing.T) {
+			curr := &FilterTarget{Syllable: row.curr, After: row.after}
 			var next *FilterTarget
 			if row.next != "" {
 				next = &FilterTarget{Syllable: row.next}

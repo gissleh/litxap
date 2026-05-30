@@ -17,6 +17,11 @@ func DiphthongFromWeakVowel(curr, next *FilterTarget) (*string, *string) {
 		return nil, nil
 	}
 
+	// Don't do this across any kind of breaks.
+	if strings.Trim(curr.After, "  \t\r") != "" {
+		return nil, nil
+	}
+
 	// *ka.me.i.e = ka.mey.e
 	if !curr.Stressed && !next.Stressed {
 		plr, _ := utf8.DecodeLastRuneInString(curr.Syllable)
@@ -52,6 +57,11 @@ func DiphthongFromWeakVowel(curr, next *FilterTarget) (*string, *string) {
 // can accept an onset.
 func ReanalyzeDiphthongs(curr, next *FilterTarget) (*string, *string) {
 	if next == nil {
+		return nil, nil
+	}
+
+	// Don't do this across any kind of breaks.
+	if strings.Trim(curr.After, "  \t\r") != "" {
 		return nil, nil
 	}
 
