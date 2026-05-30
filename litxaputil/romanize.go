@@ -289,6 +289,9 @@ func SyllablesToIPA(syllables []string, syllableDelimiter string, strongEmphasis
 	return res.String(), err
 }
 
+const IPAStrongEmphasis = "ˈ"
+const IPAWeakEmphasis = "ˌ"
+
 func WriteSyllablesAsIPATo(w io.StringWriter, syllables []string, syllableDelimiter string, strongEmphasises []int, weakEmphasises []int) error {
 	for i, syllable := range syllables {
 		if i > 0 && syllableDelimiter != "" {
@@ -299,12 +302,12 @@ func WriteSyllablesAsIPATo(w io.StringWriter, syllables []string, syllableDelimi
 		}
 
 		if slices.Contains(strongEmphasises, i) {
-			_, err := w.WriteString("ˈ")
+			_, err := w.WriteString(IPAStrongEmphasis)
 			if err != nil {
 				return err
 			}
 		} else if slices.Contains(weakEmphasises, i) {
-			_, err := w.WriteString("ˌ")
+			_, err := w.WriteString(IPAWeakEmphasis)
 			if err != nil {
 				return err
 			}
