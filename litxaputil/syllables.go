@@ -3,6 +3,7 @@ package litxaputil
 import (
 	"slices"
 	"strings"
+	"unicode"
 )
 
 var preOnsets = []string{"f", "ts", "s"}
@@ -23,10 +24,16 @@ type Syllable struct {
 
 // SplitSyllables uses predictable reanalysis rules to split a na'vi word into syllables. It will handle some
 // irregular words (including: tlalim, mangkwan, kreytu'um) but will log their irregularities.
-//
-// Only lowercase inputs are supported.
 func SplitSyllables(s string) Syllables {
 	res := make(Syllables, 0, len(s))
+
+	for _, r := range s {
+		if unicode.IsUpper(r) {
+			s = strings.ToLower(s)
+			break
+		}
+	}
+
 	for len(s) > 0 {
 		curr := Syllable{}
 
