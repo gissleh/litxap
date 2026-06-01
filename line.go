@@ -3,7 +3,6 @@ package litxap
 import (
 	"errors"
 	"fmt"
-	"log"
 	"slices"
 	"strings"
 	"unicode"
@@ -245,7 +244,6 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 
 		for j, match := range part.Matches {
 			if match.Entry.Word == "oe" {
-				log.Println(match.Entry)
 				for _, ending := range []string{"u", "U", "ù", "Ù"} {
 					if strings.HasSuffix(prevPart2.Raw, ending) {
 						s0 := match.Syllables[0]
