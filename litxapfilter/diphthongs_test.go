@@ -20,6 +20,7 @@ func TestDiphthongFromWeakVowel(t *testing.T) {
 		{"ha", "Ìng", "", "haYng", true},
 		{"hA", "Ìng", "", "hAYng", true},
 		{"me", "Ik", "", "meYk", true},
+		{"MA", "UT", "", "MAWT", true},
 		{"me", "Ik", ". ", "", false},
 		{"me", "kxa", "", "", false},
 		{"me", "", "", "", false},
@@ -69,6 +70,7 @@ func TestReanalyzeDiphthongs(t *testing.T) {
 	}{
 		{"ey", "", "e", "e", "ye"},
 		{"ay", "", "on", "a", "yon"},
+		{"ay", "", "ye", "a", ""},
 		{"vey", ".", "A", "", ""},
 		{"ay", "", "nga", "", ""},
 		{"ay", "", "", "", ""},
@@ -87,11 +89,14 @@ func TestReanalyzeDiphthongs(t *testing.T) {
 
 			if row.changeCurr == "" {
 				assert.Nil(t, changeCurr)
-				assert.Nil(t, changeNext)
 			} else {
 				if assert.NotNil(t, changeCurr) {
 					assert.Equal(t, row.changeCurr, *changeCurr)
 				}
+			}
+			if row.changeNext == "" {
+				assert.Nil(t, changeNext)
+			} else {
 				if assert.NotNil(t, changeNext) {
 					assert.Equal(t, row.changeNext, *changeNext)
 				}

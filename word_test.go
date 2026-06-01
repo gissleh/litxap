@@ -227,7 +227,6 @@ func TestRunWord(t *testing.T) {
 			Raw: "kamä", Entry: "k··ä: <am>",
 			Res: "ka.mä", ResStress: 1,
 		},
-
 		{
 			Raw: "Ensit", Entry: "*än.sìt",
 			Res: "", ResStress: -1,

@@ -18,6 +18,7 @@ type FilterTarget struct {
 	Syllable      string
 	Stressed      bool
 	After         string
+	Entry         *litxap.Entry
 }
 
 // ApplyFilters is just a wrapper for running one filter after another. They'll each make a full pass
@@ -82,6 +83,7 @@ func ApplyFilter(line litxap.Line, filter Filter) litxap.Line {
 						Syllable:      syllable,
 						Stressed:      newLine[pi].Matches[mi].Stress == si,
 						After:         "",
+						Entry:         &newLine[pi].Matches[mi].Entry,
 					}
 					next := &FilterTarget{
 						PartIndex:     pi,
@@ -90,6 +92,7 @@ func ApplyFilter(line litxap.Line, filter Filter) litxap.Line {
 						Syllable:      newLine[pi].Matches[mi].Syllables[si+1],
 						Stressed:      newLine[pi].Matches[mi].Stress == si+1,
 						After:         afterSecondSyllable,
+						Entry:         &newLine[pi].Matches[mi].Entry,
 					}
 
 					currChange, nextChange := filter(curr, next)
@@ -107,6 +110,7 @@ func ApplyFilter(line litxap.Line, filter Filter) litxap.Line {
 						Syllable:      syllable,
 						Stressed:      newLine[pi].Matches[mi].Stress == si,
 						After:         after,
+						Entry:         &newLine[pi].Matches[mi].Entry,
 					}
 
 					// Run the filter on the next word's beginning first.
@@ -124,6 +128,7 @@ func ApplyFilter(line litxap.Line, filter Filter) litxap.Line {
 								Syllable:      matchNext.Syllables[0],
 								Stressed:      matchNext.Stress == 0,
 								After:         afterNextFirstSyllable,
+								Entry:         &newLine[piNext].Matches[miNext].Entry,
 							}
 
 							currChange, nextChange := filter(curr, next)

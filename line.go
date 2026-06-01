@@ -3,6 +3,7 @@ package litxap
 import (
 	"errors"
 	"fmt"
+	"log"
 	"slices"
 	"strings"
 	"unicode"
@@ -232,22 +233,30 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 		}
 	}
 
-	// Edge case: oe + any word starting with u
+	// Edge case: oe after any word ending with u
 	for i, part := range newLine {
-		if i >= len(newLine)-2 {
-			break
+		if i < 2 {
+			continue
 		}
 		if !part.IsWord {
 			continue
 		}
-		nextPart := newLine[i+2]
+		prevPart2 := newLine[i-2]
 
 		for j, match := range part.Matches {
-			if match.Entry.Word == "oe" && strings.ToLower(strings.Join(match.Syllables, ".")) == "o.e" {
-				for _, start := range []string{"u", "U", "ù", "Ù"} {
-					if strings.HasPrefix(nextPart.Raw, start) {
+			if match.Entry.Word == "oe" {
+				log.Println(match.Entry)
+				for _, ending := range []string{"u", "U", "ù", "Ù"} {
+					if strings.HasSuffix(prevPart2.Raw, ending) {
+						s0 := match.Syllables[0]
+						s1 := match.Syllables[1]
+						if !strings.EqualFold(s0, "o") || !strings.EqualFold(s1, "e") {
+							break
+						}
+
 						newLine[i].Matches = slices.Clone(newLine[i].Matches)
-						newLine[i].Matches[j].Syllables = []string{strings.Join(match.Syllables, "")}
+						newLine[i].Matches[j].Syllables[1] = s0 + s1
+						newLine[i].Matches[j].Syllables = newLine[i].Matches[j].Syllables[1:]
 						break
 					}
 				}

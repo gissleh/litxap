@@ -9,6 +9,8 @@ import (
 )
 
 type Entry struct {
+	// The dictionary-specific ID, if available
+	ID string `json:"id,omitempty"`
 	// The Na'vi Word.
 	Word string `json:"word"`
 	// A Translation in the language, mostly to guide the user if multiple matches fit.
@@ -139,6 +141,11 @@ func (entry *Entry) String() string {
 		}
 	}
 
+	if entry.ID != "" {
+		sb.WriteString(" $id:")
+		sb.WriteString(entry.ID)
+	}
+
 	if entry.Stress == -1 {
 		sb.WriteString(" no_stress")
 	}
@@ -198,6 +205,9 @@ func ParseEntry(s string) *Entry {
 			}
 			if strings.HasPrefix(token, "<") && strings.HasSuffix(token, ">") {
 				entry.Infixes = strings.Split(token[len("<"):len(token)-len(">")], ",")
+			}
+			if strings.HasPrefix(token, "$id:") {
+				entry.ID = token[len("$id:"):]
 			}
 			if token == "no_stress" {
 				entry.Stress = -1

@@ -27,23 +27,25 @@ func DiphthongFromWeakVowel(curr, next *FilterTarget) (*string, *string) {
 		plr, _ := utf8.DecodeLastRuneInString(curr.Syllable)
 		plr = unicode.ToLower(plr)
 		if plr == 'a' || plr == 'e' {
-			if iVariant := findPrefix(next.Syllable, iVariants); iVariant != nil {
+			nfr, nfrLen := utf8.DecodeRuneInString(next.Syllable)
+
+			switch unicode.ToLower(nfr) {
+			case 'i', 'ì':
 				y := "y"
-				if *iVariant == "I" || *iVariant == "Ì" {
+				if nfr == 'I' || nfr == 'Ì' {
 					y = "Y"
 				}
 
-				currChange := curr.Syllable + y + next.Syllable[len(*iVariant):]
+				currChange := curr.Syllable + y + next.Syllable[nfrLen:]
 				nextChange := ""
 				return &currChange, &nextChange
-			}
-			if uVariant := findPrefix(next.Syllable, uVariants); uVariant != nil {
+			case 'u', 'ù':
 				w := "w"
-				if *uVariant == "U" || *uVariant == "Ù" {
+				if nfr == 'U' || nfr == 'Ù' {
 					w = "W"
 				}
 
-				currChange := curr.Syllable + w + next.Syllable[len(*uVariant):]
+				currChange := curr.Syllable + w + next.Syllable[nfrLen:]
 				nextChange := ""
 				return &currChange, &nextChange
 			}
@@ -65,26 +67,26 @@ func ReanalyzeDiphthongs(curr, next *FilterTarget) (*string, *string) {
 		return nil, nil
 	}
 
+	clr, clrLen := utf8.DecodeLastRuneInString(curr.Syllable)
+	clr = unicode.ToLower(clr)
+	if clr != 'y' && clr != 'w' {
+		return nil, nil
+	}
+
+	// Ay.ye.rik => A.ye.rik
 	nfr, _ := utf8.DecodeRuneInString(next.Syllable)
 	nfr = unicode.ToLower(nfr)
+	if clr == nfr {
+		currChange := curr.Syllable[:len(curr.Syllable)-clrLen]
+		return &currChange, nil
+	}
 	if !slices.Contains(vowels, nfr) {
 		return nil, nil
 	}
 
-	suffix := findSuffix(curr.Syllable, diphthongVariants)
-	if suffix == nil {
-		return nil, nil
-	}
-
-	_, runeLength := utf8.DecodeLastRuneInString(*suffix)
-	secondLetterInDiphthong := curr.Syllable[len(curr.Syllable)-runeLength:]
-
-	currChange := strings.TrimSuffix(curr.Syllable, secondLetterInDiphthong)
-	nextChange := secondLetterInDiphthong + next.Syllable
+	currChange := curr.Syllable[:len(curr.Syllable)-clrLen]
+	nextChange := curr.Syllable[len(curr.Syllable)-clrLen:] + next.Syllable
 	return &currChange, &nextChange
 }
 
-var diphthongVariants = []string{"ay", "ey", "aw", "ey"}
 var vowels = []rune{'i', 'ì', 'ù', 'u', 'e', 'é', 'o', 'ô', 'a', 'ä'}
-var iVariants = []string{"i", "ì"}
-var uVariants = []string{"u", "ù"}

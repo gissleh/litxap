@@ -48,6 +48,8 @@ var dummyDictionary = DummyDictionary{
 	"frapo:0":       *ParseEntry("po: fra-"),
 	"fmetan":        *ParseEntry("*fme.tan"),
 	"fmetan:0":      *ParseEntry("fme.*tan"),
+	"'efu":          *ParseEntry("'e.fu"),
+	"nitram":        *ParseEntry("nit.*ram"),
 }
 
 var lineOelNgatiKameie = Line{
@@ -250,7 +252,7 @@ func TestRunLine(t *testing.T) {
 			input: "Oe uvan si.",
 			expected: Line{
 				LinePart{Raw: "Oe", IsWord: true, Matches: []LinePartMatch{
-					{[]string{"Oe"}, 0, dummyDictionary["oe"], false},
+					{[]string{"O", "e"}, 0, dummyDictionary["oe"], false},
 				}},
 				LinePart{Raw: " "},
 				LinePart{Raw: "uvan", IsWord: true, Matches: []LinePartMatch{
@@ -261,6 +263,23 @@ func TestRunLine(t *testing.T) {
 					{[]string{"si"}, 0, dummyDictionary["si"], false},
 				}},
 				LinePart{Raw: "."},
+			},
+		},
+		{
+			input: "'EFU OE NITRAM!",
+			expected: Line{
+				LinePart{Raw: "'EFU", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"'E", "FU"}, 0, dummyDictionary["'efu"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "OE", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"OE"}, 0, dummyDictionary["oe"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "NITRAM", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"NIT", "RAM"}, 1, dummyDictionary["nitram"], false},
+				}},
+				LinePart{Raw: "!"},
 			},
 		},
 	}

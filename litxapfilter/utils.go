@@ -16,16 +16,6 @@ func findPrefix(s string, prefixes []string) *string {
 	return nil
 }
 
-func findSuffix(s string, suffixes []string) *string {
-	for _, suffix := range suffixes {
-		if suffixInS, ok := hasSuffixFold(s, suffix); ok {
-			return &suffixInS
-		}
-	}
-
-	return nil
-}
-
 func hasPrefixFold(s string, prefix string) (string, bool) {
 	if strings.HasPrefix(s, prefix) {
 		return prefix, true

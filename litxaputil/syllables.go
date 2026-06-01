@@ -18,14 +18,17 @@ type Syllable struct {
 	Irregular string
 	Body      string
 	Coda      string
+	NewWord   bool
 }
 
 // SplitSyllables uses predictable reanalysis rules to split a na'vi word into syllables. It will handle some
 // irregular words (including: tlalim, mangkwan, kreytu'um) but will log their irregularities.
+//
+// Only lowercase inputs are supported.
 func SplitSyllables(s string) Syllables {
 	res := make(Syllables, 0, len(s))
 	for len(s) > 0 {
-		var curr Syllable
+		curr := Syllable{}
 
 		// Try adding a coda
 		for _, coda := range codas {
@@ -96,6 +99,12 @@ func SplitSyllables(s string) Syllables {
 				s = strings.TrimSuffix(s, preOnset)
 				break
 			}
+		}
+
+		// handle multipart words
+		if trimmed := strings.TrimRight(s, " \t\r\n "); s != trimmed {
+			curr.NewWord = true
+			s = trimmed
 		}
 
 		// rr and ll must have an onset. Even lenition won't break this rule.

@@ -39,8 +39,8 @@ func TestLine_ApplyFilter(t *testing.T) {
 		{
 			input: "Oel ngati kameie, ma RumaUt.",
 			expected: litxap.Line{
-				{Raw: "Oel", IsWord: true, Matches: []litxap.LinePartMatch{
-					{[]string{"Oel"}, 0, dummyDictionary.entry("oel", 0), false},
+				{Raw: "Wel", IsWord: true, Matches: []litxap.LinePartMatch{
+					{[]string{"Wel"}, 0, dummyDictionary.entry("oel", 0), false},
 				}},
 				{Raw: " "},
 				{Raw: "ngati", IsWord: true, Matches: []litxap.LinePartMatch{
@@ -63,6 +63,7 @@ func TestLine_ApplyFilter(t *testing.T) {
 			filters: []Filter{
 				DiphthongFromWeakVowel,
 				ReanalyzeDiphthongs,
+				SpellOeAsWe,
 			},
 		},
 		{

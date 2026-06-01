@@ -51,6 +51,8 @@ func TestParseEntry(t *testing.T) {
 		"sä.*pxor: : explosion",
 		"tsa.heyl: no_stress: (part of tsaheyl si)",
 		"ka: <äm>: Go",
+		"s··a: <ol,ei> $id:fwew_10864: rise to a challenge",
+		"tsa.heyl: $id:fwew_3912 no_stress: (part of tsaheyl si)",
 	}
 
 	for _, row := range table {
