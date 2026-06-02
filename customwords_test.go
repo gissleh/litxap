@@ -30,6 +30,13 @@ func TestNew(t *testing.T) {
 		*ParseEntry("kel.nì: -ur: Custom Word/Name"),
 	}, entries)
 
+	entries, err = res.LookupEntries("Kelnìl")
+	assert.NoError(t, err)
+	assert.Equal(t, []Entry{
+		*ParseEntry("kel.nì: -l: Custom Word/Name"),
+		*ParseEntry("kel.nì: -ìl: Custom Word/Name"),
+	}, entries)
+
 	entries, err = res.LookupEntries("keafkxarateri")
 	assert.NoError(t, err)
 	assert.Equal(t, []Entry{

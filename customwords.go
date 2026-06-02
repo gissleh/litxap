@@ -54,7 +54,7 @@ type customWordDictionary struct {
 }
 
 func (n *customWordDictionary) LookupEntries(word string) ([]Entry, error) {
-	entryStrs, ok := n.table[word]
+	entryStrs, ok := n.table[strings.ToLower(word)]
 	if !ok {
 		return nil, ErrEntryNotFound
 	}

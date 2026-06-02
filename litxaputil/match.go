@@ -94,7 +94,7 @@ func nextSyllable(curr string, syllables []string, allowLenition bool, allowFuse
 				for _, s1 := range [2]string{syllables[1], lenitedS1} {
 					if strings.HasPrefix(s1, fusableMid) {
 						if strings.HasPrefix(currLower, syllables[0][:len(syllables[0])-len(fusableMid)]+s1) {
-							l1 := len(syllables[0]) - 1
+							l1 := len(syllables[0]) - len(fusableMid)
 							l2 := l1 + len(s1)
 
 							return []string{curr[:l2]}, curr[l2:], 2, 2
