@@ -341,6 +341,16 @@ var fusableMids = nonPseudoVowels
 var nonPseudoVowels = []string{"a", "ä", "e", "i", "ì", "o", "u", "ù"}
 var allVowels = append(nonPseudoVowels, "rr", "ll")
 
+func startsWithVowel(s string) bool {
+	for _, vowel := range allVowels {
+		if strings.HasPrefix(s, vowel) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func endsWithVowel(s string) bool {
 	for _, vowel := range allVowels {
 		if strings.HasSuffix(s, vowel) {

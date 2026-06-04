@@ -1,6 +1,9 @@
 package litxaputil
 
-import "slices"
+import (
+	"slices"
+	"strings"
+)
 
 func infix(p int, s ...string) Infix {
 	return Infix{Pos: p, SyllableSplit: s}
@@ -34,8 +37,39 @@ func (i Infix) Apply(curr []string, si, pos int) ([]string, int, int) {
 	temp = append(temp, curr[si+1:]...)
 
 	temp[si] = curr[si][:pos] + i.SyllableSplit[0]
-	temp[si2] = i.SyllableSplit[len(i.SyllableSplit)-1] + curr[si][pos:]
 
+	// The zenke <2> exception
+	if i.Pos == 2 && !startsWithVowel(curr[si][pos:]) {
+		mergeOffset := 0
+		if slices.Contains(codas, i.SyllableSplit[len(i.SyllableSplit)-1]) {
+			temp = append(temp[:si2], temp[si2+1:]...)
+			temp[si2-1] += i.SyllableSplit[len(i.SyllableSplit)-1]
+			mergeOffset = -1
+		} else if i.SyllableSplit[len(i.SyllableSplit)-1] == "" {
+			temp = append(temp[:si2], temp[si2+1:]...)
+			mergeOffset -= 1
+		} else {
+			temp[si2] = i.SyllableSplit[len(i.SyllableSplit)-1] + "e"
+		}
+
+		temp = append(temp, curr[si][pos:])
+		curr = append(curr[:0], temp...)
+
+		// Reanalyze VC.V to V.CV
+		if pos == 0 && si > 0 {
+			codaIndex := slices.IndexFunc(codas, func(coda string) bool {
+				return strings.HasSuffix(curr[si-1], coda)
+			})
+			if codaIndex != -1 {
+				curr[si-1] = strings.TrimSuffix(curr[si-1], codas[codaIndex])
+				curr[si] = codas[codaIndex] + curr[si]
+			}
+		}
+
+		return curr, si + mergeOffset + len(i.SyllableSplit), pos
+	}
+
+	temp[si2] = i.SyllableSplit[len(i.SyllableSplit)-1] + curr[si][pos:]
 	curr = append(curr[:0], temp...)
 	return curr, si + len(i.SyllableSplit) - 1, len(i.SyllableSplit[len(i.SyllableSplit)-1])
 }

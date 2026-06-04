@@ -2,9 +2,10 @@ package litxaputil
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInfixMap_Typos(t *testing.T) {
@@ -68,6 +69,30 @@ func TestInfix_Apply(t *testing.T) {
 		{
 			curr: "ka.me", infix: "ei", si: 1, pos: 1,
 			expected: "ka.me.i.e", si2: 3, pos2: 0,
+		},
+		{
+			curr: "zen.ke", infix: "ei", si: 1, pos: 0,
+			expected: "ze.ne.i.ke", si2: 3, pos2: 0,
+		},
+		{
+			curr: "zen.ke", infix: "äng", si: 1, pos: 0,
+			expected: "ze.näng.ke", si2: 2, pos2: 0,
+		},
+		{
+			curr: "zen.ke", infix: "ats", si: 1, pos: 0,
+			expected: "ze.na.tse.ke", si2: 3, pos2: 0,
+		},
+		{
+			curr: "zen.ke", infix: "uy", si: 1, pos: 0,
+			expected: "ze.nu.ye.ke", si2: 3, pos2: 0,
+		},
+		{
+			curr: "ta.ron", infix: "ei", si: 1, pos: 1,
+			expected: "ta.re.i.on", si2: 3, pos2: 0,
+		},
+		{
+			curr: "fme.tok", infix: "ats", si: 1, pos: 1,
+			expected: "fme.ta.tsok", si2: 2, pos2: 2,
 		},
 	}
 
