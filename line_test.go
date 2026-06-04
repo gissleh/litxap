@@ -50,6 +50,9 @@ var dummyDictionary = DummyDictionary{
 	"fmetan:0":      *ParseEntry("fme.*tan"),
 	"'efu":          *ParseEntry("'e.fu"),
 	"nitram":        *ParseEntry("nit.*ram"),
+	"mì":            *ParseEntry("mì"),
+	"oer":           *ParseEntry("*o.e: -r"),
+	"tìnitram":      *ParseEntry("tì.nit.*ram"),
 }
 
 var lineOelNgatiKameie = Line{
@@ -172,6 +175,23 @@ func TestRunLine(t *testing.T) {
 				LinePart{Raw: " "},
 				LinePart{Raw: "skeynven", Lookup: "säkeynven", IsWord: true, Matches: []LinePartMatch{
 					{[]string{"skeyn", "ven"}, 1, dummyDictionary["säkeynven"], false},
+				}},
+				LinePart{Raw: "."},
+			},
+		},
+		{
+			input: "Lu oer tìnitram.", // This line crashes 1.13.2
+			expected: Line{
+				LinePart{Raw: "Lu", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"Lu"}, 0, dummyDictionary["lu"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "oer", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"oer"}, 0, dummyDictionary["oer"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "tìnitram", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"tì", "nit", "ram"}, 2, dummyDictionary["tìnitram"], false},
 				}},
 				LinePart{Raw: "."},
 			},

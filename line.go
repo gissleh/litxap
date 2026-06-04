@@ -234,26 +234,24 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 
 	// Edge case: oe after any word ending with u
 	for i, part := range newLine {
-		if i < 2 {
+		// Only check words at position 2 that are within the same clause.
+		if i < 2 || !part.IsWord || strings.Trim(newLine[i-1].Raw, "  \r\t\n") != "" {
 			continue
 		}
-		if !part.IsWord {
-			continue
-		}
+
 		prevPart2 := newLine[i-2]
 
 		for j, match := range part.Matches {
 			if match.Entry.Word == "oe" {
 				for _, ending := range []string{"u", "U", "ù", "Ù"} {
 					if strings.HasSuffix(prevPart2.Raw, ending) {
-						s0 := match.Syllables[0]
-						s1 := match.Syllables[1]
-						if !strings.EqualFold(s0, "o") || !strings.EqualFold(s1, "e") {
+						if !strings.EqualFold(match.Syllables[0], "o") ||
+							(len(match.Syllables) > 1 && !strings.EqualFold(match.Syllables[1], "e")) {
 							break
 						}
 
 						newLine[i].Matches = slices.Clone(newLine[i].Matches)
-						newLine[i].Matches[j].Syllables[1] = s0 + s1
+						newLine[i].Matches[j].Syllables[1] = match.Syllables[0] + match.Syllables[1]
 						newLine[i].Matches[j].Syllables = newLine[i].Matches[j].Syllables[1:]
 						break
 					}
