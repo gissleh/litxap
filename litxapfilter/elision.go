@@ -36,7 +36,7 @@ func ElideMiSiNiBeforeAy(curr, next *FilterTarget) (*string, *string) {
 
 	for i, elideSyllable := range elideSyllables {
 		if strings.EqualFold(curr.Syllable, elideSyllable) {
-			if elideSyllablesWord[i] != "" && curr.Entry.Word != elideSyllablesWord[i] {
+			if elideSyllablesWord[i] != "" && strings.TrimSuffix(curr.Entry.Word, "+") != elideSyllablesWord[i] {
 				return nil, nil
 			}
 

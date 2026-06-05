@@ -68,6 +68,7 @@ func TestElideMiSiNiBeforeAy(t *testing.T) {
 	}{
 		{"nì", "", "ay", "ayfo", "nay"},
 		{"sì", " ", "ay", "sì", "say"},
+		{"Mì", " ", "ay", "mì+", "May"},
 		{"sì", "", "", "aynga", ""},
 		{"mì", "", "fa", "mìfa", ""},
 		{"mì", " ", "ay", "kelku", ""},
@@ -76,7 +77,7 @@ func TestElideMiSiNiBeforeAy(t *testing.T) {
 	}
 
 	for _, row := range table {
-		t.Run(fmt.Sprintf("%s%s%s", row.curr, row.after, row.next), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%s%s%s(%s)", row.curr, row.after, row.next, row.word), func(t *testing.T) {
 			curr := &FilterTarget{Syllable: row.curr, After: row.after}
 			var next *FilterTarget
 			if row.next != "" {
