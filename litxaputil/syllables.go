@@ -68,7 +68,7 @@ func SplitSyllables(s string) Syllables {
 		if !foundBody {
 			if len(res) > 0 {
 				last := &res[len(res)-1]
-				if last.PreOnset != "" {
+				if last.PreOnset != "" || last.Irregular != "" {
 					return nil
 				}
 

@@ -38,6 +38,7 @@ func TestParseSyllables(t *testing.T) {
 		{"SÄLEYM", "sä-leym", Syllable{Onset: "s", Body: "ä"}},
 		{"", "", Syllable{}},
 		{"X", "<nil>", Syllable{}},
+		{"klreytu'um", "<nil>", Syllable{}},
 		{"ehanis", "<nil>", Syllable{}},
 		{"keln", "<nil>", Syllable{}},
 		{"ftspa", "<nil>", Syllable{}},
