@@ -172,6 +172,35 @@ func TestLine_ApplyFilter(t *testing.T) {
 				DemoteEjectivesBeforeConsonants,
 			},
 		},
+		{
+			input: "Sunu oer aymauti, sì ayspxam nìayfo!",
+			expected: litxap.Line{
+				{Raw: "Sunu", IsWord: true, Matches: []litxap.LinePartMatch{
+					{[]string{"Su", "nu"}, 0, dummyDictionary.entry("sunu", 0), false},
+				}},
+				{Raw: " "},
+				{Raw: "oer", IsWord: true, Matches: []litxap.LinePartMatch{
+					{[]string{"oer"}, 0, dummyDictionary.entry("oer", 0), false},
+				}},
+				{Raw: " "},
+				{Raw: "aymauti", IsWord: true, Matches: []litxap.LinePartMatch{
+					{[]string{"ay", "ma", "u", "ti"}, 1, dummyDictionary.entry("aymauti", 0), false},
+				}},
+				{Raw: ", "},
+				{Raw: "sayspxa", IsWord: true, Matches: []litxap.LinePartMatch{
+					{[]string{"say", "spxa"}, 1, dummyDictionary.entry("ayspxam", 0), false},
+				}},
+				{Raw: " "},
+				{Raw: "nayfo", IsWord: true, Matches: []litxap.LinePartMatch{
+					{[]string{"nay", "fo"}, 1, dummyDictionary.entry("nìayfo", 0), false},
+				}},
+				{Raw: "!"},
+			},
+			filters: []Filter{
+				ElideMiSiNiBeforeAy,
+				NasalAssimilation,
+			},
+		},
 	}
 
 	for _, row := range table {
@@ -274,4 +303,9 @@ var dummyDictionary = DummyDictionary{
 	"sì":       "sì",
 	"fpomron":  "fpom.*ron",
 	"yo'":      "y··o'",
+	"sunu":     "su.nu",
+	"oer":      "*o.e: -r",
+	"aymauti":  "*ma.u.ti: ay-",
+	"ayspxam":  "spxam: ay-",
+	"nìayfo":   "ay.*fo: nì-",
 }

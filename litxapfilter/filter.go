@@ -7,7 +7,7 @@ import (
 	"github.com/gissleh/litxap"
 )
 
-// A Filter takes in a sliding window of three syllables and return modification to
+// A Filter takes in a sliding window of two syllables and return modification to
 // the current and the next.
 type Filter func(curr, next *FilterTarget) (*string, *string)
 
@@ -153,6 +153,9 @@ func ApplyFilter(line litxap.Line, filter Filter) litxap.Line {
 
 	// Remove cleared syllables
 	if copiedLine {
+		matchDeleteList := make([]int, 0)
+		partDeleteList := make([]int, 0)
+
 		for pi, part := range newLine {
 			if !copiedParts[pi] {
 				continue
@@ -178,7 +181,27 @@ func ApplyFilter(line litxap.Line, filter Filter) litxap.Line {
 				if mi == 0 {
 					newLine[pi].Raw = strings.Join(newLine[pi].Matches[mi].Syllables, "")
 				}
+
+				if len(newLine[pi].Matches[mi].Syllables) == 0 {
+					matchDeleteList = append(matchDeleteList, mi-len(matchDeleteList))
+				}
 			}
+
+			for _, mi := range matchDeleteList {
+				newLine[pi].Matches = append(newLine[pi].Matches[:mi], newLine[pi].Matches[mi+1:]...)
+			}
+			matchDeleteList = matchDeleteList[:0]
+
+			if len(newLine[pi].Matches) == 0 {
+				partDeleteList = append(partDeleteList, pi-len(partDeleteList))
+				if pi < len(newLine)-1 {
+					partDeleteList = append(partDeleteList, (pi+1)-len(partDeleteList))
+				}
+			}
+		}
+
+		for _, pi := range partDeleteList {
+			newLine = append(newLine[:pi], newLine[pi+1:]...)
 		}
 	}
 
