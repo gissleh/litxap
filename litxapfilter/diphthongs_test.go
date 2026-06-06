@@ -71,6 +71,7 @@ func TestReanalyzeDiphthongs(t *testing.T) {
 		{"ey", "", "e", "e", "ye"},
 		{"ay", "", "on", "a", "yon"},
 		{"ay", "", "ye", "a", ""},
+		{"ay", "", "oe", "", ""},
 		{"vey", ".", "A", "", ""},
 		{"ay", "", "nga", "", ""},
 		{"ay", "", "", "", ""},

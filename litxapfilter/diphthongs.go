@@ -73,6 +73,11 @@ func ReanalyzeDiphthongs(curr, next *FilterTarget) (*string, *string) {
 		return nil, nil
 	}
 
+	// Ay.oe =/=> A.yoe
+	if _, has := hasPrefixFold(next.Syllable, "oe"); has {
+		return nil, nil
+	}
+
 	// Ay.ye.rik => A.ye.rik
 	nfr, _ := utf8.DecodeRuneInString(next.Syllable)
 	nfr = unicode.ToLower(nfr)
