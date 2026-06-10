@@ -246,7 +246,7 @@ func TestRunWord(t *testing.T) {
 			res, resStress := RunWord(row.Raw, *ParseEntry(row.Entry))
 
 			syllables, stress, root := ParseEntry(row.Entry).GenerateSyllables()
-			t.Log("Generated Syllables", syllables)
+			t.Log("Generated Syllables", strings.Join(syllables, "."))
 			t.Log("Generated Stress", stress)
 			t.Log("Generated Root", root)
 

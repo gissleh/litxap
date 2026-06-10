@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNew(t *testing.T) {
+func TestCustomWords(t *testing.T) {
 	res := CustomWords([]string{"nor", "no", "ta-*mu", "-ke.a.fkxa.ra", "kel.nì", "te.li.si"}, "")
 	assert.Equal(t, []string{"nor: ", "no: -r "}, res.(*customWordDictionary).table["nor"])
 	assert.Equal(t, []string{"ta.*mu: -ri "}, res.(*customWordDictionary).table["tamuri"])
@@ -51,4 +51,16 @@ func TestNew(t *testing.T) {
 	entries, err = res.LookupEntries("neytiriti")
 	assert.ErrorIs(t, err, ErrEntryNotFound)
 	assert.Nil(t, entries)
+}
+
+func TestCustomWords_WithIDs(t *testing.T) {
+	res := CustomWordsWithIDs(map[string]string{
+		"nor":    "1",
+		"ta-*mu": "2",
+		"kel.nì": "3",
+	}, "")
+
+	assert.Equal(t, "1", ParseEntry(res.(*customWordDictionary).table["nor"][0]).ID)
+	assert.Equal(t, "2", ParseEntry(res.(*customWordDictionary).table["tamul"][0]).ID)
+	assert.Equal(t, "3", ParseEntry(res.(*customWordDictionary).table["kelnur"][0]).ID)
 }

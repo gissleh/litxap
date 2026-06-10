@@ -8,11 +8,22 @@ import (
 // CustomWords generates a dictionary for custom words like names and so on. It has a hardcoded set of
 // adpositions, so that must be changed if we get a new one. This does not enforce suffix rules.
 func CustomWords(names []string, definition string) Dictionary {
+	namesMap := make(map[string]string, len(names))
+	for _, name := range names {
+		namesMap[name] = ""
+	}
+
+	return CustomWordsWithIDs(namesMap, definition)
+}
+
+var doubleSpaceRemover = strings.NewReplacer("   ", " ", "  ", " ")
+
+func CustomWordsWithIDs(names map[string]string, definition string) Dictionary {
 	table := make(map[string][]string)
 
-	for _, name := range names {
+	for name, id := range names {
 		beforeTrim := len(name)
-		name := strings.TrimPrefix(name, "-")
+		name := strings.TrimPrefix(strings.TrimPrefix(name, "."), "-")
 		noStress := ""
 		if len(name) != beforeTrim {
 			noStress = "no_stress"
@@ -20,24 +31,34 @@ func CustomWords(names []string, definition string) Dictionary {
 
 		name = strings.ReplaceAll(strings.ToLower(name), "-", ".")
 		key := strings.ReplaceAll(strings.ReplaceAll(name, "*", ""), ".", "")
+		idStr := ""
+		if id != "" {
+			idStr = fmt.Sprintf("$id:%s", id)
+		}
 
-		table[key] = append(table[key], fmt.Sprintf("%s: %s", name, noStress))
+		table[key] = append(table[key], fmt.Sprintf("%s: %s %s", name, idStr, noStress))
 		for _, suffix := range customWordSuffixes {
 			key := key + suffix
-			table[key] = append(table[key], fmt.Sprintf("%s: -%s %s", name, suffix, noStress))
+			table[key] = append(table[key], fmt.Sprintf("%s: -%s %s %s", name, suffix, idStr, noStress))
 		}
 		for _, adposition := range customWordAdpositions {
 			key := key + adposition
-			table[key] = append(table[key], fmt.Sprintf("%s: -%s %s", name, adposition, noStress))
+			table[key] = append(table[key], fmt.Sprintf("%s: -%s %s %s", name, adposition, idStr, noStress))
 		}
 
 		if possibleLoanWord := strings.TrimSuffix(name, "ì"); possibleLoanWord != name {
 			key := strings.Replace(strings.Replace(possibleLoanWord, "*", "", -1), ".", "", -1)
-			table[key] = append(table[key], fmt.Sprintf("%s: %s", name, noStress))
+			table[key] = append(table[key], fmt.Sprintf("%s: %s %s", name, idStr, noStress))
 			for _, suffix := range customWordLoanWordSuffixes {
 				key := key + suffix
-				table[key] = append(table[key], fmt.Sprintf("%s: -%s %s", name, suffix, noStress))
+				table[key] = append(table[key], fmt.Sprintf("%s: -%s %s %s", name, suffix, idStr, noStress))
 			}
+		}
+	}
+
+	for key := range table {
+		for i := range table[key] {
+			table[key][i] = doubleSpaceRemover.Replace(table[key][i])
 		}
 	}
 

@@ -251,6 +251,7 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 						}
 
 						newLine[i].Matches = slices.Clone(newLine[i].Matches)
+						newLine[i].Matches[j].Syllables = slices.Clone(newLine[i].Matches[j].Syllables)
 						newLine[i].Matches[j].Syllables[1] = match.Syllables[0] + match.Syllables[1]
 						newLine[i].Matches[j].Syllables = newLine[i].Matches[j].Syllables[1:]
 						break

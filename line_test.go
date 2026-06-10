@@ -48,11 +48,16 @@ var dummyDictionary = DummyDictionary{
 	"frapo:0":       *ParseEntry("po: fra-"),
 	"fmetan":        *ParseEntry("*fme.tan"),
 	"fmetan:0":      *ParseEntry("fme.*tan"),
-	"'efu":          *ParseEntry("'e.fu"),
+	"'efu":          *ParseEntry("*'·e.f·u"),
 	"nitram":        *ParseEntry("nit.*ram"),
 	"mì":            *ParseEntry("mì"),
 	"oer":           *ParseEntry("*o.e: -r"),
 	"tìnitram":      *ParseEntry("tì.nit.*ram"),
+	"ngeyn":         *ParseEntry("ngeyn"),
+	"talun":         *ParseEntry("ta.*lun"),
+	"talun:0":       *ParseEntry("ta.*lun"),
+	"holahaw":       *ParseEntry("*h·a.h·aw: <ol>"),
+	"nìtam":         *ParseEntry("nì.*tam"),
 }
 
 var lineOelNgatiKameie = Line{
@@ -302,6 +307,44 @@ func TestRunLine(t *testing.T) {
 				LinePart{Raw: "!"},
 			},
 		},
+		{
+			input: "'Efu oe ngeyn talun oe ke holahaw nìtam.",
+			expected: Line{
+				LinePart{Raw: "'Efu", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"'E", "fu"}, 0, dummyDictionary["'efu"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "oe", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"oe"}, 0, dummyDictionary["oe"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "ngeyn", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"ngeyn"}, 0, dummyDictionary["ngeyn"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "talun", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"ta", "lun"}, 1, dummyDictionary["talun"], false},
+					{[]string{"ta", "lun"}, 1, dummyDictionary["talun:0"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "oe", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"o", "e"}, 0, dummyDictionary["oe"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "ke", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"ke"}, 0, dummyDictionary["ke"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "holahaw", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"ho", "la", "haw"}, 1, dummyDictionary["holahaw"], false},
+				}},
+				LinePart{Raw: " "},
+				LinePart{Raw: "nìtam", IsWord: true, Matches: []LinePartMatch{
+					{[]string{"nì", "tam"}, 1, dummyDictionary["nìtam"], false},
+				}},
+				LinePart{Raw: "."},
+			},
+		},
 	}
 
 	for _, row := range table {
@@ -311,6 +354,12 @@ func TestRunLine(t *testing.T) {
 			res, err = RunLine(row.input, dummyDictionary)
 			assert.NoError(t, err)
 			assert.Equal(t, row.expected, res)
+
+			if t.Failed() {
+				t.Log("dummyLineFormatter preview:")
+				t.Log("  Expected:", row.expected.Format(&dummyLineFormatter{}, nil))
+				t.Log("  Actual  :", res.Format(&dummyLineFormatter{}, nil))
+			}
 		})
 	}
 
