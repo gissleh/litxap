@@ -21,6 +21,8 @@ func TestDiphthongFromWeakVowel(t *testing.T) {
 		{"hA", "Ìng", "", "hAYng", true},
 		{"me", "Ik", "", "meYk", true},
 		{"MA", "UT", "", "MAWT", true},
+		{"me", "ul", " ", "mewl", true},
+		{"me", "*ul", " ", "", false},
 		{"me", "Ik", ". ", "", false},
 		{"me", "kxa", "", "", false},
 		{"me", "", "", "", false},

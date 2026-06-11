@@ -1,6 +1,7 @@
 package litxap
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,14 +9,17 @@ import (
 
 func TestCustomWords(t *testing.T) {
 	res := CustomWords([]string{"nor", "no", "ta-*mu", "-ke.a.fkxa.ra", "kel.nì", "te.li.si"}, "")
-	assert.Equal(t, []string{"nor: ", "no: -r "}, res.(*customWordDictionary).table["nor"])
+
+	sort.Strings(res.(*customWordDictionary).table["nor"]) // Just for the test, because Go maps randomize
+
+	assert.Equal(t, []string{"no: -r ", "nor: "}, res.(*customWordDictionary).table["nor"])
 	assert.Equal(t, []string{"ta.*mu: -ri "}, res.(*customWordDictionary).table["tamuri"])
 
 	entries, err := res.LookupEntries("nor")
 	assert.NoError(t, err)
 	assert.Equal(t, []Entry{
-		*ParseEntry("nor: : Custom Word/Name"),
 		*ParseEntry("no: -r: Custom Word/Name"),
+		*ParseEntry("nor: : Custom Word/Name"),
 	}, entries)
 
 	entries, err = res.LookupEntries("tamul")

@@ -266,6 +266,25 @@ func (line Line) runWithCache(dict Dictionary, dictCache map[string][]Entry, run
 	return newLine, nil
 }
 
+func (line Line) WithSelections(selections map[int]int, firstByDefault bool) Line {
+	newLine := slices.Clone(line)
+	for i, part := range newLine {
+		if len(part.Matches) > 1 {
+			selection, ok := selections[i]
+			if !ok || selection < 0 || selection >= len(part.Matches) {
+				if !firstByDefault {
+					continue
+				}
+				selection = 0
+			}
+
+			newLine[i].Matches = []LinePartMatch{newLine[i].Matches[selection]}
+		}
+	}
+
+	return newLine
+}
+
 type LinePart struct {
 	Raw     string          `json:"raw"`
 	Lookup  string          `json:"lookup,omitempty"`

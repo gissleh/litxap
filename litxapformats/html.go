@@ -13,7 +13,7 @@ func CompactHTML() litxap.LineFormatter {
 
 type compactHtmlFormatter struct{}
 
-func (f *compactHtmlFormatter) LinePartTags(lp litxap.LinePart, stress int) (string, string) {
+func (f *compactHtmlFormatter) LinePartTags(_ litxap.LinePart, stress int) (string, string) {
 	switch stress {
 	case litxap.LPSNotWord:
 		return "", ""

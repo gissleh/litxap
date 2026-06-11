@@ -569,3 +569,37 @@ func TestLine_IPA(t *testing.T) {
 		})
 	}
 }
+
+func TestLine_WithSelections(t *testing.T) {
+	assert.Equal(t, lineKaltxiMaFmetan, lineKaltxiMaFmetan.WithSelections(nil, false))
+
+	assert.Equal(t, Line{
+		LinePart{Raw: "Kaltxì", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"Kal", "txì"}, 1, dummyDictionary["kaltxì"], false},
+		}},
+		LinePart{Raw: ", "},
+		LinePart{Raw: "ma", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"ma"}, 0, dummyDictionary["ma"], false},
+		}},
+		LinePart{Raw: " "},
+		LinePart{Raw: "Fmetan", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"Fme", "tan"}, 0, dummyDictionary["fmetan"], false},
+		}},
+		LinePart{Raw: "!"},
+	}, lineKaltxiMaFmetan.WithSelections(nil, true))
+
+	assert.Equal(t, Line{
+		LinePart{Raw: "Kaltxì", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"Kal", "txì"}, 1, dummyDictionary["kaltxì"], false},
+		}},
+		LinePart{Raw: ", "},
+		LinePart{Raw: "ma", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"ma"}, 0, dummyDictionary["ma"], false},
+		}},
+		LinePart{Raw: " "},
+		LinePart{Raw: "Fmetan", IsWord: true, Matches: []LinePartMatch{
+			{[]string{"Fme", "tan"}, 1, dummyDictionary["fmetan:0"], false},
+		}},
+		LinePart{Raw: "!"},
+	}, lineKaltxiMaFmetan.WithSelections(map[int]int{4: 1}, false))
+}
