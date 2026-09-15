@@ -198,7 +198,7 @@ func TestLine_ApplyFilter(t *testing.T) {
 			},
 			filters: []Filter{
 				ElideMiSiNiBeforeAy,
-				NasalAssimilation,
+				NasalAssimilationCasual,
 			},
 		},
 	}
