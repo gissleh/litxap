@@ -116,7 +116,7 @@ func TestLine_ApplyFilter(t *testing.T) {
 				}},
 				{Raw: "!"},
 			},
-			filters: []Filter{NasalAssimilation},
+			filters: []Filter{NasalAssimilationCasual},
 		},
 		{
 			input: "Fmetan?",
@@ -168,7 +168,7 @@ func TestLine_ApplyFilter(t *testing.T) {
 				{Raw: "."},
 			},
 			filters: []Filter{
-				NasalAssimilation,
+				NasalAssimilationCasual,
 				DemoteEjectivesBeforeConsonants,
 			},
 		},
