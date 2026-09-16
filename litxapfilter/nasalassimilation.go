@@ -37,6 +37,8 @@ func nasalAssimilation(rapid bool, curr, next *FilterTarget) (*string, *string) 
 			if !slices.Contains(allowedList, next.Entry.Word) {
 				return nil, nil
 			}
+		} else {
+			return nil, nil
 		}
 	}
 

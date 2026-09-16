@@ -70,6 +70,7 @@ func TestNasalAssimilation(t *testing.T) {
 		{"tìng", "mi", "tì", "tìng", "mikyun", 0, 0},
 		{"tìng", "po", "", "tìng", "po", 0, 0},
 		{"tìng", "na", "", "tìng", "nari: -t", 0, 0},
+		{"tsun", "pi", "", "tsun", "peng: <iv>", 0, 0},
 	}
 
 	for _, row := range table {
