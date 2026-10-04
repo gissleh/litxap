@@ -58,6 +58,7 @@ func TestReefDropGlottalStopsBetweenVowels(t *testing.T) {
 		{"ep", "", "'ang", ""},
 		{"ve", "", "", ""},
 		{"ma", " ", "'e", ""},
+		{"'u", "", "e", ""},
 	}
 
 	for _, row := range table {

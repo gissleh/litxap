@@ -12,7 +12,13 @@ func DropGlottalStopBetweenUnlikeVowels(curr, next *FilterTarget) (*string, *str
 }
 
 func dropGlottalStop(curr, next *FilterTarget, unlikeOnly bool) (*string, *string) {
-	if next == nil || !strings.HasPrefix(next.Syllable, "'") {
+	if next == nil {
+		return nil, nil
+	}
+
+	inCurr := strings.HasSuffix(curr.Syllable, "'")
+	inNext := strings.HasPrefix(next.Syllable, "'")
+	if !inCurr && !inNext {
 		return nil, nil
 	}
 
@@ -21,15 +27,29 @@ func dropGlottalStop(curr, next *FilterTarget, unlikeOnly bool) (*string, *strin
 		return nil, nil
 	}
 
-	clr, _ := utf8.DecodeLastRuneInString(curr.Syllable)
-	nsr, _ := utf8.DecodeRuneInString(next.Syllable[len("'"):])
-	if unlikeOnly && unicode.ToLower(clr) == unicode.ToLower(nsr) {
+	var withoutStop string
+	var clr, nsr rune
+	if inCurr {
+		withoutStop = curr.Syllable[:len(curr.Syllable)-len("'")]
+		clr, _ = utf8.DecodeLastRuneInString(withoutStop)
+		nsr, _ = utf8.DecodeRuneInString(next.Syllable)
+	} else {
+		withoutStop = next.Syllable[len("'"):]
+		clr, _ = utf8.DecodeLastRuneInString(curr.Syllable)
+		nsr, _ = utf8.DecodeRuneInString(withoutStop)
+	}
+	clr = unicode.ToLower(clr)
+	nsr = unicode.ToLower(nsr)
+
+	if unlikeOnly && clr == nsr {
 		return nil, nil
 	}
-	if !slices.Contains(vowels, unicode.ToLower(clr)) || !slices.Contains(vowels, unicode.ToLower(nsr)) {
+	if !slices.Contains(vowels, clr) || !slices.Contains(vowels, nsr) {
 		return nil, nil
 	}
 
-	newNext := next.Syllable[len("'"):]
-	return nil, &newNext
+	if inCurr {
+		return &withoutStop, nil
+	}
+	return nil, &withoutStop
 }

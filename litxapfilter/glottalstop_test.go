@@ -12,18 +12,24 @@ func TestDropGlottalStopsBetweenUnlikeVowels(t *testing.T) {
 		currSyllable string
 		currAfter    string
 		nextSyllable string
+		currChange   string
 		nextChange   string
 	}{
-		{"ve", "", "'O", "O"},
-		{"fra", "", "'u", "u"},
-		{"fra", "", "'Ur", "Ur"},
-		{"ep", "", "'ang", ""},
-		{"rä", "", "'ä", ""},
-		{"rä", "", "'Ä", ""},
-		{"rÄ", "", "'ä", ""},
-		{"rÄ", "", "'Ä", ""},
-		{"ve", "", "", ""},
-		{"ma", " ", "'e", ""},
+		{"ve", "", "'O", "", "O"},
+		{"fra", "", "'u", "", "u"},
+		{"fra", "", "'Ur", "", "Ur"},
+		{"lo'", "", "ak", "lo", ""},
+		{"lo'", "", "ak", "lo", ""},
+		{"sa'", "", "nok", "", ""},
+		{"ep", "", "'ang", "", ""},
+		{"rä", "", "'ä", "", ""},
+		{"rä", "", "'Ä", "", ""},
+		{"rÄ", "", "'ä", "", ""},
+		{"rÄ", "", "'Ä", "", ""},
+		{"ve", "", "", "", ""},
+		{"ma", " ", "'ey", "", ""},
+		{"fpe'", " ", "a", "", ""},
+		{"na", "", "er", "", ""},
 	}
 
 	for _, row := range table {
@@ -38,7 +44,13 @@ func TestDropGlottalStopsBetweenUnlikeVowels(t *testing.T) {
 			}
 
 			currChange, nextChange := DropGlottalStopBetweenUnlikeVowels(curr, next)
-			assert.Nil(t, currChange)
+			if row.currChange == "" {
+				assert.Nil(t, currChange)
+			} else {
+				if assert.NotNil(t, currChange) {
+					assert.Equal(t, row.currChange, *currChange)
+				}
+			}
 			if row.nextChange == "" {
 				assert.Nil(t, nextChange)
 			} else {
