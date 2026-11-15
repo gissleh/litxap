@@ -22,9 +22,10 @@ func TestApplySuffixes(t *testing.T) {
 		{"fko", false, "l", "fkol"},
 		{"mo", false, "t", "mot"},
 		{"mo", false, "o", "mo.o"},
-		{"txon", false, "ejectiveReplacer", "txon.ejectiveReplacer"}, // Ungrammatical, but coverage is coverage.
 		{"tì.fme.tok", false, "ur", "tì.fme.to.kur"},
+		{"tsam", false, "o,t", "tsa.mot"},
 		{"tsam", false, "o,ti", "tsa.mo.ti"},
+		{"tsam", false, "t", "tsam.t"}, // ungrammatical, but coverage is coverage.
 		{"tsa.mo", false, "ti", "tsa.mo.ti"},
 		{"fpom", false, "ka", "fpom.ka"},
 		{"ta.ron", true, "tswo,tsyìp,o,teri", "ta.ron.tswo.tsyì.po.te.ri"},

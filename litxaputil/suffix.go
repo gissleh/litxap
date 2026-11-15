@@ -37,7 +37,7 @@ func (suffix Suffix) Apply(curr []string) []string {
 				return append(curr, suffix.syllableSplit[1:]...)
 			}
 		}
-		return append(curr, suffix.syllableSplit...)
+		return append(curr, suffix.syllableSplit...) // This should not happen in newer fwew versions
 	case sraStealCoda:
 		unStealableCoda := false
 		for _, coda := range unStealableCodas {
@@ -151,20 +151,19 @@ var suffixMap = map[string]Suffix{
 	"a": suffix(sraStealCoda, "a").isAfterSi(),
 	"o": suffix(sraStealCoda, "o"),
 
-	"l":                suffix(sraAttach, "l"),
-	"ìl":               suffix(sraStealCoda, "ìl"),
-	"t":                suffix(sraAttach, "t"),
-	"ti":               suffix(sraNewSyllable, "ti"),
-	"it":               suffix(sraStealCoda, "it"),
-	"ejectiveReplacer": suffix(sraAttach, "ejectiveReplacer"),
-	"r":                suffix(sraAttach, "r"),
-	"ru":               suffix(sraNewSyllable, "ru"),
-	"ur":               suffix(sraStealCoda, "ur"),
-	"yä":               suffix(sraNewSyllable, "yä"),
-	"ye":               suffix(sraNewSyllable, "ye"),
-	"y":                suffix(sraAttach, "y"),
-	"ä":                suffix(sraStealCoda, "ä"),
-	"e":                suffix(sraStealCoda, "e"),
-	"ri":               suffix(sraNewSyllable, "ri"),
-	"ìri":              suffix(sraStealCoda, "ì", "ri"),
+	"l":   suffix(sraAttach, "l"),
+	"ìl":  suffix(sraStealCoda, "ìl"),
+	"t":   suffix(sraAttach, "t"),
+	"ti":  suffix(sraNewSyllable, "ti"),
+	"it":  suffix(sraStealCoda, "it"),
+	"r":   suffix(sraAttach, "r"),
+	"ru":  suffix(sraNewSyllable, "ru"),
+	"ur":  suffix(sraStealCoda, "ur"),
+	"yä":  suffix(sraNewSyllable, "yä"),
+	"ye":  suffix(sraNewSyllable, "ye"),
+	"y":   suffix(sraAttach, "y"),
+	"ä":   suffix(sraStealCoda, "ä"),
+	"e":   suffix(sraStealCoda, "e"),
+	"ri":  suffix(sraNewSyllable, "ri"),
+	"ìri": suffix(sraStealCoda, "ì", "ri"),
 }
